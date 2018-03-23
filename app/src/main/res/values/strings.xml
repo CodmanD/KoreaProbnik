@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">KoreaProbnik</string>
+    <string name="user_name">KoreaProbnik</string>
+    <string name="user_password">KoreaProbnik</string>
+    <string name="sign_in">KoreaProbnik</string>
+    <string name="sign_out">KoreaProbnik</string>
+</resources>
