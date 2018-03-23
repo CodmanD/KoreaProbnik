@@ -4,4 +4,7 @@
     <string name="user_password">KoreaProbnik</string>
     <string name="sign_in">KoreaProbnik</string>
     <string name="sign_out">KoreaProbnik</string>
+    <string name="action_add">Добавить</string>
+    <string name="action_update">Изменить</string>
+    <string name="action_delete">Удалить</string>
 </resources>

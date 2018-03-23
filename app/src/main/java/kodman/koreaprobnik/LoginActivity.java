@@ -44,6 +44,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.login_screen);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        email = preferences.getString(Cnst.Email, "");
+        if(!email.equals(""))
+        {
+            Log.d(Cnst.TAG,"auth уже");
+            Intent intent= new Intent(LoginActivity.this,MainActivity.class);
+            startActivity(intent);
+        }
         ImageView iv= this.findViewById(R.id.iv);
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,12 +68,7 @@ public class LoginActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        email = preferences.getString(Cnst.Email, "");
-        if(!email.equals(""))
-        {
 
-        }
 
 /*
         mAuth.signInWithEmailAndPassword(email, password)
@@ -95,8 +98,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void signIn() {
-       // Log.d(Cnst.TAG,"Sign In");
-        //Toast.makeText(this,"Wait",Toast.LENGTH_SHORT).show();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent,Cnst.RC_SIGN_IN);
