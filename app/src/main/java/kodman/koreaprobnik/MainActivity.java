@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             products.add(new Product("product "+i));
         }
 
-        MyAdapter adapter = new MyAdapter(products);
+        MyAdapter adapter = new MyAdapter(products,this);
         recyclerView.setAdapter(adapter);
     }
 

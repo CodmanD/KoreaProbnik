@@ -1,5 +1,6 @@
 package kodman.koreaprobnik.Adapter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import kodman.koreaprobnik.EditActivity;
 import kodman.koreaprobnik.MainActivity;
 import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.R;
@@ -25,10 +28,12 @@ import kodman.koreaprobnik.Util.Cnst;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
 
-
+    private Context context;
     private List<Product> products;
 
-    public MyAdapter(List<Product> products) {
+    public MyAdapter(List<Product> products,Context context) {
+
+        this.context=context;
         this.products = products;
     }
 
@@ -86,11 +91,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
 
-                    //    Toast.makeText(EventsActivity.this, "CLICK id = " + id.getText(), Toast.LENGTH_SHORT).show();
-                  //  Intent intent = new Intent(context, ProductActivity.class);
+                       Toast.makeText(context, "CLICK id = " + tv.getText(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, EditActivity.class);
                     //intent.putExtra("ID", Integer.parseInt(id.getText().toString()));
 
-                  //  startActivity(intent);
+                    context.startActivity(intent);
                 }
             });
         }
