@@ -13,6 +13,14 @@ public class Product {
     private String pathImage;
     private float price;
 
+    public Product(String title) {
+        this.title = title;
+    }
+
+    public Product() {
+        this.title="unknown product";
+    }
+
     public float getPrice() {
         return price;
     }
