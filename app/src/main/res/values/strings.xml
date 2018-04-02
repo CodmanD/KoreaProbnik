@@ -10,4 +10,10 @@
     <string name="action_add">Добавить</string>
     <string name="action_update">Изменить</string>
     <string name="action_delete">Удалить</string>
+
+    <string name="category1">Крем</string>
+    <string name="category2">Патчи</string>
+    <string name="category3">Хрень</string>
+    <string name="category4">Вааще Хрень</string>
+    <string name="category5">Ыщё Хрень</string>
 </resources>
