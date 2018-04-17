@@ -1,5 +1,7 @@
 package kodman.koreaprobnik.Model;
 
+import android.net.Uri;
+
 /**
  * Created by DI1 on 23.03.2018.
  */
@@ -11,10 +13,21 @@ public class Product {
     private String category;
     private String description;
     private String pathImage;
+    private Uri uri;
     private float price;
 
     public Product(String title) {
         this.title = title;
+        this.pathImage="content://media/external/images/media/136728";
+        uri=Uri.parse(this.pathImage);
+    }
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     public Product() {

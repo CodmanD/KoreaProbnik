@@ -3,23 +3,40 @@ package kodman.koreaprobnik.Util;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import kodman.koreaprobnik.LoginActivity;
 import kodman.koreaprobnik.MainActivity;
@@ -37,6 +54,8 @@ public class FirestoreHelper {
     private FirebaseAuth mAuth;
     private static AppCompatActivity activity;
     private static FirestoreHelper instance;
+    static FirebaseStorage storage;
+
 
     private Context context;
 
@@ -47,6 +66,8 @@ public class FirestoreHelper {
         {
 
             instance = new FirestoreHelper(activity);
+            storage  = FirebaseStorage.getInstance();
+
         }
         return instance;
 
@@ -71,6 +92,74 @@ public class FirestoreHelper {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         activity.startActivityForResult(signInIntent,Cnst.RC_SIGN_IN);
     }
+
+public void uploadFile(Uri file){
+
+    StorageReference storageRef = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com");
+    StorageReference riversRef = storageRef.child("images/"+file.getLastPathSegment());
+
+// создаем uploadTask посредством вызова метода putFile(), в качестве аргумента идет созданная нами ранее Uri
+    UploadTask uploadTask = riversRef.putFile(file);
+
+// устанавливаем 1-й слушатель на uploadTask, который среагирует, если произойдет ошибка, а также 2-й слушатель, который сработает в случае успеха операции
+    uploadTask.addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+// Ошибка
+        }
+    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        @Override
+        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+// Успешно! Берем ссылку прямую https-ссылку на файл
+            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+            Log.d(Cnst.TAG,"Succes");
+        }
+    });
+
+}
+
+public void downloadFile(String file,final ImageView iv)
+{
+
+    StorageReference storageRef = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com");
+    StorageReference islandRef = storageRef.child("images/"+file);
+
+    try {
+        final File localFile = File.createTempFile(file, "jpg");
+
+    islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+        @Override
+        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+            // Local temp file has been created
+            try {
+                FileInputStream fis = new FileInputStream(localFile);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+
+                Bitmap img = BitmapFactory.decodeStream(bis);
+
+                iv.setImageBitmap(img);
+                fis.close();
+                bis.close();
+               // Log.d(Cnst.TAG,"GetFile");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d(Cnst.TAG,"Exception:"+e.getMessage());
+            }
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            // Handle any errors
+        }
+    });
+    }
+    catch (IOException ioe)
+    {
+        ioe.printStackTrace();
+        Log.d(Cnst.TAG,"Exception:"+ioe.getMessage());
+    }
+}
 
 
     public void signOut() {
