@@ -10,10 +10,22 @@
     <string name="action_add">Добавить</string>
     <string name="action_update">Изменить</string>
     <string name="action_delete">Удалить</string>
+    <string name="action_save">Сохранить</string>
 
     <string name="category1">Крем</string>
     <string name="category2">Патчи</string>
     <string name="category3">Хрень</string>
     <string name="category4">Вааще Хрень</string>
     <string name="category5">Ыщё Хрень</string>
+
+    <string name="name">Название:</string>
+    <string name="price">Цена:</string>
+    <string name="description">Описание:</string>
+
+
+    <string-array name="category">
+        <item>Крем</item>
+        <item>Маски</item>
+        <item>Патчи</item>
+    </string-array>
 </resources>
