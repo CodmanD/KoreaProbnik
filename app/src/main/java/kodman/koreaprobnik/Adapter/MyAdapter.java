@@ -34,7 +34,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private Context context;
     private List<Product> products;
     private FirestoreHelper fb;
-
+    Product product;
     public MyAdapter(List<Product> products, Context context, AppCompatActivity activity) {
 
         this.context=context;
@@ -57,7 +57,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
 
         try {
-            Product product = products.get(i);
+            product = products.get(i);
             Log.d(Cnst.TAG,"onBindViewHolder event = "+product.getTitle());
             viewHolder.tv.setText(product.getTitle());
             //viewHolder.alarmName.setText(event.getAlarmName());
@@ -107,7 +107,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
                        Toast.makeText(context, "CLICK id = " + tv.getText(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(context, EditActivity.class);
-                    //intent.putExtra("ID", Integer.parseInt(id.getText().toString()));
+                    intent.putExtra(Cnst.PRODUCT, product);
 
                     context.startActivity(intent);
                 }

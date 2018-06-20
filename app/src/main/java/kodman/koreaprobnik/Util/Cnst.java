@@ -7,6 +7,7 @@ package kodman.koreaprobnik.Util;
 public  final class Cnst {
 
     public static String TAG="TAG";
+    public static String PRODUCT="product";
 
     public  static final int RC_SIGN_IN = 9001;
     public  static final int RESULT_GALLERY= 9002;

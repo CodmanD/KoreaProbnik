@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
+
+
     defaultConfig {
         applicationId "kodman.koreaprobnik"
         minSdkVersion 15
@@ -15,6 +17,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    dataBinding {
+        enabled = true
     }
 }
 
@@ -43,5 +48,6 @@ dependencies {
 
 
 
-
 apply plugin: 'com.google.gms.google-services'
+
+//apply plugin: 'com.android.databinding'

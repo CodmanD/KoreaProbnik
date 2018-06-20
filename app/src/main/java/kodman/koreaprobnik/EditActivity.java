@@ -1,8 +1,12 @@
 package kodman.koreaprobnik;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
+
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -12,68 +16,114 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirestoreHelper;
+import kodman.koreaprobnik.databinding.ActivityEditBinding;
 
 /**
  * Created by DI1 on 30.03.2018.
  */
 
-public class EditActivity extends AppCompatActivity {
+public class EditActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.drawer_layout)
-    DrawerLayout mDrawerLayout;
+//    @BindView(R.id.drawer_layout)
+//    DrawerLayout mDrawerLayout;
 
-    @BindView(R.id.navigation)
-    NavigationView navigationView;
+    //    @BindView(R.id.navigation)
+//    NavigationView navigationView;
+    @BindView(R.id.spinner)
+    Spinner spinner;
+
+    @BindView(R.id.iv)
+    ImageView imageView;
 
 
+    @BindView(R.id.etName)
+    EditText etName;
+    @BindView(R.id.etPrice)
+    EditText etPrice;
+    @BindView(R.id.etDescription)
+    EditText etDescription;
+    Product product ;
+    final int RESULT_GALLERY = 1;
+
+
+    ActivityEditBinding binding;
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv:
+
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, RESULT_GALLERY);
+                // Intent intent=new Intent(EditActivity.this,)
+                break;
+        }
+    }
+
+    private Product getProduct(){
+
+        product =(Product) getIntent().getParcelableExtra(Cnst.PRODUCT);
+
+       // product.setTitle("крем №1");
+       // product.setDescription("от морщин");
+       // product.setPrice(100.25f);
+        return product;}
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_edit);
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        //setContentView(R.layout.activity_edit);
+        //  ButterKnife.bind(this);
+
+        getProduct();
+
+
+      binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit);
+        binding.setProduct(product);
+        //  binding.setProduct(Demo.getUser());
+
+
+        String[] data = getResources().getStringArray(R.array.category);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(adapter);
+
+        //spinner.setPrompt("TITLE CATEGORY");
+
+
+        //binding.imageView.setOnClickListener(this);
+
+        setSupportActionBar(binding.toolbar);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mDrawerLayout.isDrawerOpen(navigationView))
-                    mDrawerLayout.closeDrawers();
-
-                else
-                    mDrawerLayout.openDrawer(navigationView);
+                onBackPressed();
             }
         });
-
-  navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
-                        // close drawer when item is tapped
-                       // mDrawerLayout.closeDrawers();
-
-                        Toast.makeText(EditActivity.this,menuItem.getTitle(),Toast.LENGTH_SHORT).show();
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-
-                        return true;
-                    }
-                });
-
-
-
-
     }
 
     @Override
@@ -91,32 +141,44 @@ public class EditActivity extends AppCompatActivity {
                 Intent galleryIntent = new Intent(
                         Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent , Cnst.RESULT_GALLERY );
+                startActivityForResult(galleryIntent, Cnst.RESULT_GALLERY);
                 return true;
             }
         }
-      return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
-            case Cnst.RESULT_GALLERY :
-                if (null != data) {
-                   Log.d(Cnst.TAG,"Reuslt = "+data.getData());
-                    // imageUri = data.getData();
-                    //Do whatever that you desire here. or leave this blank
-                    addFileToFirestorage(data.getData());
+            case RESULT_GALLERY:
+                Bitmap bitmap = null;
+
+
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = data.getData();
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.d("---", "setBitmap = " + bitmap);
+                     binding.iv.setImageBitmap(bitmap);
                 }
-                break;
+
+
+//
+
             default:
                 break;
         }
     }
 
 
-    private void addFileToFirestorage(Uri file){
+    private void addFileToFirestorage(Uri file) {
         FirestoreHelper.getInstance(this).uploadFile(file);
 
     }

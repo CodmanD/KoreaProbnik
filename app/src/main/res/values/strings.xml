@@ -23,6 +23,7 @@
     <string name="description">Описание:</string>
 
 
+    <string name="spinner_title">Выберите категорию:  </string>
     <string-array name="category">
         <item>Крем</item>
         <item>Маски</item>
