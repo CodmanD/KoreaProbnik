@@ -62,8 +62,11 @@ public class Product extends BaseObservable implements Parcelable {
 
     public Product(String title) {
         this.title = title;
+
+        this.description="some description";
+        this.price=100.50f;
         this.pathImage="content://media/external/images/media/136728";
-        uri=Uri.parse(this.pathImage);
+        this.uri=Uri.parse(this.pathImage);
     }
 
     public Uri getUri() {
@@ -76,6 +79,9 @@ public class Product extends BaseObservable implements Parcelable {
 
     public Product() {
         this.title="unknown product";
+        this.description="some description";
+        this.price=100.50f;
+
     }
 
     @Bindable

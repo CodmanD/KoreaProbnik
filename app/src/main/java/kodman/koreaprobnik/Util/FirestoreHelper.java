@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -27,8 +28,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -37,10 +41,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import kodman.koreaprobnik.LoginActivity;
 import kodman.koreaprobnik.MainActivity;
+import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.R;
+
+import static kodman.koreaprobnik.Util.Cnst.TAG;
 
 /**
  * Created by DI1 on 02.04.2018.
@@ -56,6 +66,10 @@ public class FirestoreHelper {
     private static FirestoreHelper instance;
     static FirebaseStorage storage;
 
+
+    FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+
+    private String user="";
 
     private Context context;
 
@@ -76,7 +90,7 @@ public class FirestoreHelper {
     private FirestoreHelper(AppCompatActivity activity)
     {
         this.activity=activity;
-
+        this.context=activity.getApplicationContext();
 
         //FirebaseFirestore.setLoggingEnabled(true);
         //Google Sign_iN
@@ -113,11 +127,44 @@ public void uploadFile(Uri file){
 // Успешно! Берем ссылку прямую https-ссылку на файл
             Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
-            Log.d(Cnst.TAG,"Succes");
+            Log.d(TAG,"Succes");
         }
     });
 
 }
+
+public void uploadProduct(Product p,String user)
+{
+    Map<String,Object> product = new HashMap<>();
+    //event.put("owner", user);
+    product.put("title", p.getTitle());
+    product.put("category",p.getCategory());
+    product.put("description",p.getDescription());
+    //event.put("uid",currentAE.getUID());
+    product.put("uid",p.getId());
+    product.put("price",p.getPrice());
+    product.put("uri",String.valueOf( p.getUri()));
+
+
+    mFirestore.collection(user).document(p.getId())
+
+            .set(product)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Toast.makeText(context,"Save to Firestore",Toast.LENGTH_SHORT).show();
+                    // Log.d(TAG, "DocumentSnapshot successfully written!");
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(context,"Error saving to Firestore",Toast.LENGTH_SHORT).show();
+                    //Log.w(TAG, "Error writing document", e);
+                }
+            });
+}
+
 
 public void downloadFile(String file,final ImageView iv)
 {
@@ -144,7 +191,7 @@ public void downloadFile(String file,final ImageView iv)
                // Log.d(Cnst.TAG,"GetFile");
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.d(Cnst.TAG,"Exception:"+e.getMessage());
+                Log.d(TAG,"Exception:"+e.getMessage());
             }
         }
     }).addOnFailureListener(new OnFailureListener() {
@@ -157,7 +204,7 @@ public void downloadFile(String file,final ImageView iv)
     catch (IOException ioe)
     {
         ioe.printStackTrace();
-        Log.d(Cnst.TAG,"Exception:"+ioe.getMessage());
+        Log.d(TAG,"Exception:"+ioe.getMessage());
     }
 }
 
@@ -175,7 +222,7 @@ public void downloadFile(String file,final ImageView iv)
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         //updateUI(null);
-                        Log.d(Cnst.TAG, "Sign OUT complete");
+                        Log.d(TAG, "Sign OUT complete");
                     }
                 });
     }
@@ -196,7 +243,7 @@ public void downloadFile(String file,final ImageView iv)
 
 
     public void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(Cnst.TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
         ((MainActivity)activity).showProgress();
         // [END_EXCLUDE]
@@ -217,7 +264,7 @@ public void downloadFile(String file,final ImageView iv)
                             // SharedPreferences.Editor sPEditor= PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
                             //sPEditor.putString(Cnst.Email,user.getEmail());
                             //sPEditor.commit();
-                            Log.d(Cnst.TAG,"Editor put email: "+user.getEmail());
+                            Log.d(TAG,"Editor put email: "+user.getEmail());
 
 
 
@@ -234,5 +281,69 @@ public void downloadFile(String file,final ImageView iv)
                         // [END_EXCLUDE]
                     }
                 });
+    }
+
+    public ArrayList<Product> downloadListFirestore(String user)
+    {
+
+// Remove the 'capital' field from the document
+
+        final ArrayList<Product> list= new ArrayList<>();
+        Log.d(TAG,"read from server= ");
+        // List listE=mFirestore.document("events");
+
+        mFirestore.collection(user).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot document = task.getResult();
+
+
+                    if (document != null ) {
+
+                        String title;
+                        String id;
+                        String category;
+                        String description;
+                        float price;
+                        String  uri;
+                        //long  lastModified;
+                       // DatabaseHelper dbHelper=DatabaseHelper.getInstance(context);
+                        for(int i=0;i<document.getDocuments().size();i++)
+                        {
+
+                            title=String.valueOf(document.getDocuments().get(i).getData().get("title"));
+                            description=String.valueOf(document.getDocuments().get(i).getData().get("description"));
+                            category=String.valueOf(document.getDocuments().get(i).getData().get("category"));
+                            //title=String.valueOf(document.getDocuments().get(i).getData().get("title"));
+                            id=document.getDocuments().get(i).getId();
+                            price=Float.parseFloat(String.valueOf(document.getDocuments().get(i).getData().get("price")));
+                           uri=String.valueOf(document.getDocuments().get(i).getData().get("uri"));
+
+                           Product p= new Product();
+                           p.setId(id);
+                           p.setCategory(category);
+                           p.setDescription(description);
+                           p.setTitle(title);
+                           p.setUri(Uri.parse(uri));
+                           p.setPrice(price);
+
+
+                            list.add(p);
+
+                            Log.d(Cnst.TAG, "Document data: " + document.getDocuments().get(i).getId());
+                        }
+
+
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+        Log.d(TAG, "return list size= "+list.size());
+ return list;
     }
 }

@@ -1,6 +1,8 @@
 package kodman.koreaprobnik;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -20,16 +22,17 @@ import android.support.v7.widget.Toolbar;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import kodman.koreaprobnik.Adapter.MyAdapter;
+import kodman.koreaprobnik.Adapter.AdapterProduct;
 import kodman.koreaprobnik.Model.Product;
-import kodman.koreaprobnik.R;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirestoreHelper;
 
@@ -49,20 +52,25 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.rv)
     RecyclerView recyclerView;
 
+    FirestoreHelper mFirestoreHelper;
+
+    List<Product> products = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mFirestoreHelper = FirestoreHelper.getInstance(MainActivity.this);
 
-
+        addListToFireStore();
         setSupportActionBar(toolbar);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mDrawerLayout.isDrawerOpen(navigationView))
+                if (mDrawerLayout.isDrawerOpen(navigationView))
                     mDrawerLayout.closeDrawers();
 
                 else
@@ -79,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                         // close drawer when item is tapped
                         // mDrawerLayout.closeDrawers();
 
-                        Toast.makeText(MainActivity.this,menuItem.getTitle(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
 
@@ -92,21 +100,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
 
-        List<Product> products=new ArrayList<>();
-        for(int i=0;i<10;i++)
-        {
-            products.add(new Product("product "+i));
-        }
-
-        MyAdapter adapter = new MyAdapter(products,this,this);
+        AdapterProduct adapter = new AdapterProduct(products, this, this);
         recyclerView.setAdapter(adapter);
     }
-
-
-
-
-
-
 
 
     @Override
@@ -131,21 +127,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void showProgress() {
 
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0);
 
-public void showProgress(){
-
-    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0);
-
-       progressBar.setLayoutParams(params );
+        progressBar.setLayoutParams(params);
         progressBar.setVisibility(ProgressBar.VISIBLE);
         progressBar.invalidate();
 
-}
-    public void hideProgress(){
+    }
+
+    public void hideProgress() {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0);
 
-        progressBar.setLayoutParams(params );
+        progressBar.setLayoutParams(params);
 
         progressBar.setVisibility(ProgressBar.INVISIBLE);
         progressBar.invalidate();
@@ -155,6 +150,24 @@ public void showProgress(){
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    private void addListToFireStore() {
+        products = mFirestoreHelper.downloadListFirestore("kodman.dev@gmail.com");
+//        if (products.size() == 0){
+//            //UidGenerator ug = new UidGenerator(null, "uidGen");
+//            for (int i = 0; i < 10; i++) {
+//                products.add(new Product("product " + i));
+//                products.get(i).setId(String.valueOf(i));
+//              //  products.get(i).setUri(Uri.parse(""));
+//                mFirestoreHelper.uploadProduct(products.get(i),"kodman.dev@gmail.com");
+//            }
+//        }
+//        else{
+//            Toast.makeText(this,"Reeead from FS",Toast.LENGTH_SHORT).show();
+//        }
+
+
     }
 
     @Override
@@ -168,7 +181,7 @@ public void showProgress(){
             }
             case R.id.actionOut: {
 
-               // Toast.makeText(this, "Log out", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(this, "Log out", Toast.LENGTH_SHORT).show();
                 FirestoreHelper.getInstance(this).signOut();
                 return true;
             }
@@ -195,4 +208,6 @@ public void showProgress(){
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }
