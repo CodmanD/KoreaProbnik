@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,6 +44,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import kodman.koreaprobnik.LoginActivity;
@@ -62,7 +64,7 @@ public class FirestoreHelper {
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInOptions gso;
     private FirebaseAuth mAuth;
-    private static AppCompatActivity activity;
+     private static AppCompatActivity activity;
     private static FirestoreHelper instance;
     static FirebaseStorage storage;
 
@@ -71,7 +73,7 @@ public class FirestoreHelper {
 
     private String user="";
 
-    private Context context;
+  final  private Context context;
 
 
     public static FirestoreHelper getInstance(AppCompatActivity activity)
@@ -283,18 +285,33 @@ public void downloadFile(String file,final ImageView iv)
                 });
     }
 
-    public ArrayList<Product> downloadListFirestore(String user)
+    public void downloadListFirestore(String user,final List<Product> list)
     {
 
 // Remove the 'capital' field from the document
 
-        final ArrayList<Product> list= new ArrayList<>();
+      //  final ArrayList<Product> list= new ArrayList<>();
         Log.d(TAG,"read from server= ");
         // List listE=mFirestore.document("events");
 
+
+        mFirestore.collection(user).get().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(Cnst.TAG,"FailureListener");
+            }
+        });
+        mFirestore.collection(user).get().addOnCanceledListener(new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+                Log.d(Cnst.TAG,"CanceledListener");
+            }
+        });
         mFirestore.collection(user).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                Log.d(Cnst.TAG,"CompleteListener");
                 if (task.isSuccessful()) {
                     QuerySnapshot document = task.getResult();
 
@@ -325,25 +342,28 @@ public void downloadFile(String file,final ImageView iv)
                            p.setCategory(category);
                            p.setDescription(description);
                            p.setTitle(title);
-                           p.setUri(Uri.parse(uri));
+                         //  p.setUri(Uri.parse(uri));
                            p.setPrice(price);
 
 
                             list.add(p);
 
-                            Log.d(Cnst.TAG, "Document data: " + document.getDocuments().get(i).getId());
+
+                           // Log.d(Cnst.TAG, "Document data: " + document.getDocuments().get(i).getId());
                         }
 
-
+                        ((MainActivity)activity).updateData();
+                        Log.d(Cnst.TAG, "Document data COMPLETE ");
                     } else {
                         Log.d(TAG, "No such document");
                     }
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+                    Toast.makeText(context,"Download ERROR",Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "get failed with ", task.getException());
                 }
             }
         });
         Log.d(TAG, "return list size= "+list.size());
- return list;
+      //return list;
     }
 }

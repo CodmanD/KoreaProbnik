@@ -161,7 +161,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                     Uri selectedImage = data.getData();
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                        product.setUri(selectedImage);
+                       // product.setUri(selectedImage);
                         Log.d("---", "setUri = " + selectedImage);
                     } catch (IOException e) {
                         e.printStackTrace();

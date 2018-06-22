@@ -52,13 +52,25 @@ public class Product extends BaseObservable implements Parcelable {
 
     }
 
+
+
     private String id;
     private String title;
     private String category;
     private String description;
     private String pathImage;
-    private Uri uri;
+    private String uri;
     private float price;
+
+    public Product(String uid,String title,String category,String description,String uri,String price){
+
+        this.id=uid;
+        this.title=title;
+        this.category=category;
+        this.description=description;
+        this.uri=uri;
+        this.price=Float.parseFloat(price);
+    }
 
     public Product(String title) {
         this.title = title;
@@ -66,14 +78,14 @@ public class Product extends BaseObservable implements Parcelable {
         this.description="some description";
         this.price=100.50f;
         this.pathImage="content://media/external/images/media/136728";
-        this.uri=Uri.parse(this.pathImage);
+       // this.uri=Uri.parse(this.pathImage);
     }
 
-    public Uri getUri() {
+    public String getUri() {
         return uri;
     }
 
-    public void setUri(Uri uri) {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 

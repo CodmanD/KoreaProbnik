@@ -24,6 +24,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -51,20 +54,38 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     @BindView(R.id.rv)
     RecyclerView recyclerView;
-
+    private FirebaseFirestore mFirestore;
     FirestoreHelper mFirestoreHelper;
 
-    List<Product> products = new ArrayList<>();
+    List<Product> products = new ArrayList<>(100);
+    AdapterProduct adapter;
+
+    private Query mQuery;
+
+    public void updateData(){
+
+        Log.i(Cnst.TAG," update recycler");
+      //  adapter = new AdapterProduct(products, this, this);
+      //  recyclerView.setAdapter(adapter);
+       // recyclerView.invalidate();
+        adapter.notifyDataSetChanged();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(Cnst.TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+        mFirestore=FirebaseFirestore.getInstance();
         mFirestoreHelper = FirestoreHelper.getInstance(MainActivity.this);
 
-        addListToFireStore();
+        mQuery=  mFirestore.collection("kodman.dev@gmail.com")
+                .orderBy("title", Query.Direction.DESCENDING)
+                .limit(100);
+
+       // addListToFireStore();
         setSupportActionBar(toolbar);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -100,7 +121,30 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
 
-        AdapterProduct adapter = new AdapterProduct(products, this, this);
+       adapter = new AdapterProduct(mQuery,products, this, this){
+
+           @Override
+           protected void onDataChanged() {
+
+               // Покажи/спрячь данные в UI если запрос возвращается пустым
+               if (getItemCount() == 0) {
+                   recyclerView.setVisibility(View.GONE);
+                   //mEmptyView.setVisibility(View.VISIBLE);
+
+               } else {
+                   recyclerView.setVisibility(View.VISIBLE);
+                   //mEmptyView.setVisibility(View.GONE);
+               }
+           }
+
+           @Override
+           protected void onError(FirebaseFirestoreException e) {
+               // Покажи снакбар в случаи ошибки
+               Snackbar.make(findViewById(android.R.id.content),
+                       "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
+           }
+       };
+        adapter.startListening();
         recyclerView.setAdapter(adapter);
     }
 
@@ -153,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addListToFireStore() {
-        products = mFirestoreHelper.downloadListFirestore("kodman.dev@gmail.com");
+        mFirestoreHelper.downloadListFirestore("kodman.dev@gmail.com",products);
 //        if (products.size() == 0){
 //            //UidGenerator ug = new UidGenerator(null, "uidGen");
 //            for (int i = 0; i < 10; i++) {
