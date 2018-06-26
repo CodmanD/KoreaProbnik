@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,9 +19,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,6 +39,7 @@ import kodman.koreaprobnik.EditActivity;
 import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.R;
 import kodman.koreaprobnik.Util.Cnst;
+import kodman.koreaprobnik.Util.FirebaseImageLoader;
 import kodman.koreaprobnik.Util.FirestoreHelper;
 
 /**
@@ -94,7 +107,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
         private ImageView iv;
         private Product currentProduct;
 
-        public void bind(final DocumentSnapshot snapshot)//,final OnRestaurantSelectedListener listener) {
+        public void bind(final DocumentSnapshot snapshot) //,final OnRestaurantSelectedListener listener) {
         {
 
             Log.d(Cnst.TAG,"bind : "+snapshot);
@@ -113,12 +126,49 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
             Log.d(Cnst.TAG,"Bind Product = "+currentProduct.getUri());
             // String file = product.getPathImage();
-
-
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
+        StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/136728");
             // Загружаем изображения
-            Glide.with(context)
-                    .load( "gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")
-                    .into(iv);
+
+            final long ONE_MEGABYTE = 1024*1024;
+
+
+//          gsReference.getFile(Uri.parse("gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+//              @Override
+//              public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+//                  Log.d(Cnst.TAG,"onComplete  : ");
+//              }
+//          });
+//
+
+
+            try {
+              final File  localFile   = File.createTempFile("images", "jpg");
+                httpsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+
+                        iv.setImageBitmap(myBitmap);
+                        Log.d(Cnst.TAG,"onSucces : "+taskSnapshot.getStorage().getName());
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Cnst.TAG,"Faillure : "+e.getMessage());
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+//            Glide.with(context)
+//
+//                    .load(httpsReference)
+//                   // .using(new FirebaseImageLoader())
+//                 //   .load( "gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")
+//                    .into(iv);
 
         }
 
