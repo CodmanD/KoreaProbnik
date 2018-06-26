@@ -1,12 +1,15 @@
 package kodman.koreaprobnik;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -22,7 +25,17 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -136,19 +149,50 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionAdd: {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference();
 
-                //Toast.makeText(this, "NEW EVENT", Toast.LENGTH_SHORT).show();
-                Intent galleryIntent = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, Cnst.RESULT_GALLERY);
+               StorageReference riversRef = storageRef.child("images/"+Uri.parse(product.getUri()).getLastPathSegment());
+
+                    UploadTask  uploadTask = riversRef.putFile(Uri.parse(product.getUri()));
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+
+                            Toast.makeText(getBaseContext(),getResources().getString(R.string.failure_upload),Toast.LENGTH_SHORT).show();
+                            Log.d(Cnst.TAG,"onFailure upload:"+exception);
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            Toast.makeText(getBaseContext(),getResources().getString(R.string.succes_upload),Toast.LENGTH_SHORT).show();
+                            Log.d(Cnst.TAG,"onSucces upload");
+
+                        }
+                    });
+
+
                 return true;
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
-
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -161,15 +205,17 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                     Uri selectedImage = data.getData();
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                  //   data.getData().getEncodedPath();
+                        product.setUri(data.getData().toString());
                        // product.setUri(selectedImage);
-                        Log.d("---", "setUri = " + selectedImage);
+                        Log.d(Cnst.TAG, "setUri = " );
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.d("---", "setUri = " + selectedImage);
                     }
 
                     Log.d("---", "setBitmap = " + bitmap);
-                     binding.iv.setImageBitmap(bitmap);
+                   //  binding.iv.setImageBitmap(bitmap);
                 }
 
 

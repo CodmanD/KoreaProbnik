@@ -131,7 +131,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
         StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/136728");
             // Загружаем изображения
 
-            final long ONE_MEGABYTE = 1024*1024;
+
 
 
 //          gsReference.getFile(Uri.parse("gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
@@ -151,7 +151,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
 
                         iv.setImageBitmap(myBitmap);
-                        Log.d(Cnst.TAG,"onSucces : "+taskSnapshot.getStorage().getName());
+                     //   Log.d(Cnst.TAG,"onSucces : "+taskSnapshot.getStorage().getName());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
