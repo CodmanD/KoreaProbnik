@@ -18,14 +18,21 @@
     <string name="category4">Вааще Хрень</string>
     <string name="category5">Ыщё Хрень</string>
 
+
     <string name="name">Название:</string>
+    <string name="title">Название:</string>
     <string name="price">Цена:</string>
+    <string name="category">Категория</string>
     <string name="description">Описание:</string>
     <string name="failure_upload">Ошибка записи файла на сервер</string>
+    <string name="failure_add">Ошибка добавления на сервер</string>
     <string name="succes_upload">Файл успешно добавлен</string>
+    <string name="succes_add">Продукт добавлен</string>
+    <string name="succes_update">Продукт изменен</string>
+    <string name="failure_update">Ошибка изменения на сервер</string>
 
     <string name="spinner_title">Выберите категорию:  </string>
-    <string-array name="category">
+    <string-array name="categories">
         <item>Крем</item>
         <item>Маски</item>
         <item>Патчи</item>

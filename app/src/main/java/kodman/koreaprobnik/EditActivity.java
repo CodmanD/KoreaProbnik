@@ -93,27 +93,20 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
 
         product =(Product) getIntent().getParcelableExtra(Cnst.PRODUCT);
 
-       // product.setTitle("крем №1");
-       // product.setDescription("от морщин");
-       // product.setPrice(100.25f);
         return product;}
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //setContentView(R.layout.activity_edit);
-        //  ButterKnife.bind(this);
-
         getProduct();
 
-
-      binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit);
+        binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit);
         binding.setProduct(product);
         //  binding.setProduct(Demo.getUser());
 
 
-        String[] data = getResources().getStringArray(R.array.category);
+        String[] data = getResources().getStringArray(R.array.categories);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -149,31 +142,14 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionAdd: {
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                StorageReference storageRef = storage.getReference();
 
-               StorageReference riversRef = storageRef.child("images/"+Uri.parse(product.getUri()).getLastPathSegment());
-
-                    UploadTask  uploadTask = riversRef.putFile(Uri.parse(product.getUri()));
-                    uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-
-                            Toast.makeText(getBaseContext(),getResources().getString(R.string.failure_upload),Toast.LENGTH_SHORT).show();
-                            Log.d(Cnst.TAG,"onFailure upload:"+exception);
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                            Toast.makeText(getBaseContext(),getResources().getString(R.string.succes_upload),Toast.LENGTH_SHORT).show();
-                            Log.d(Cnst.TAG,"onSucces upload");
-
-                        }
-                    });
-
-
+                FirestoreHelper.getInstance(this).uploadImage(this,product);
+                return true;
+            }
+            case R.id.actionUpdate: {
+                 Log.d(Cnst.TAG,"Info binding p= "+binding.getProduct().getId()+" | "+binding.getProduct().getTitle());
+                Log.d(Cnst.TAG,"Info p= "+product.getId()+" | "+product.getTitle());
+                //FirestoreHelper.getInstance(this).uploadImage(this,product);
                 return true;
             }
         }
@@ -208,14 +184,14 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                   //   data.getData().getEncodedPath();
                         product.setUri(data.getData().toString());
                        // product.setUri(selectedImage);
-                        Log.d(Cnst.TAG, "setUri = " );
+                      //  Log.d(Cnst.TAG, "setUri = " );
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.d("---", "setUri = " + selectedImage);
                     }
 
-                    Log.d("---", "setBitmap = " + bitmap);
-                   //  binding.iv.setImageBitmap(bitmap);
+                   // Log.d("---", "setBitmap = " + bitmap);
+                     binding.iv.setImageBitmap(bitmap);
                 }
 
 

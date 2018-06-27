@@ -13,4 +13,13 @@ public  final class Cnst {
     public  static final int RESULT_GALLERY= 9002;
     public  static final String Email = "Email";
 
+    public static String TITLE="title";
+    public static String CATEGORY="category";
+    public static String DESCRIPTION="description";
+    public static String PATH_IMAGE="pathImage";
+    public static String ID="id";
+    public static String PRICE="price";
+
+
+    public static String IMAGES="images/";
 }

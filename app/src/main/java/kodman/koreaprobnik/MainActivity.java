@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateData(){
 
-        Log.i(Cnst.TAG," update recycler");
+        Log.d(Cnst.TAG," update recycler");
       //  adapter = new AdapterProduct(products, this, this);
       //  recyclerView.setAdapter(adapter);
        // recyclerView.invalidate();

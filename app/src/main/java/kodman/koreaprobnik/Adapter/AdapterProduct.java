@@ -78,14 +78,8 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-
-
-            viewHolder.bind(getSnapshot(i));
-           // fb.downloadFile(product.getUri().getLastPathSegment(), viewHolder.iv);
-
-
-
-    }
+       viewHolder.bind(getSnapshot(i));
+      }
 
 //    @Override
 //    public int getItemCount() {
@@ -110,8 +104,12 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
         public void bind(final DocumentSnapshot snapshot) //,final OnRestaurantSelectedListener listener) {
         {
 
-            Log.d(Cnst.TAG,"bind : "+snapshot);
+
             currentProduct = snapshot.toObject(Product.class);
+           // currentProduct.setId(snapshot.getId());
+
+           // currentProduct.setPathImage(snapshot.g.getData().get(Cnst.IMAGES).toString());
+            //Log.d(Cnst.TAG,"bind : "+snapshot.getId());
             Resources resources = itemView.getResources();
 
 
@@ -124,28 +122,23 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             // Log.d(Cnst.TAG, "onBindViewHolder event = " + product.getTitle()+" URI = "+product.getUri());
            // uri=product.getUri();
 
-            Log.d(Cnst.TAG,"Bind Product = "+currentProduct.getUri());
+          //  Log.d(Cnst.TAG,"Bind Product = "+currentProduct.getUri());
             // String file = product.getPathImage();
             FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
-        StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/136728");
+           // StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
+
+            Log.d(Cnst.TAG,"Bind Product  pathImage= "+currentProduct);
+
+            //StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/171045");
             // Загружаем изображения
 
 
 
-
-//          gsReference.getFile(Uri.parse("gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
-//              @Override
-//              public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-//                  Log.d(Cnst.TAG,"onComplete  : ");
-//              }
-//          });
-//
-
-
             try {
-              final File  localFile   = File.createTempFile("images", "jpg");
-                httpsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                   StorageReference gsReference = storage.getReferenceFromUrl(currentProduct.getPathImage());
+                  final File  localFile   = File.createTempFile("images", "jpg");
+
+                gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
@@ -160,6 +153,9 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                     }
                 });
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
 

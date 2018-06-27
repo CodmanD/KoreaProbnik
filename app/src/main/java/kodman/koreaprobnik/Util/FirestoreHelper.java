@@ -366,4 +366,99 @@ public void downloadFile(String file,final ImageView iv)
         Log.d(TAG, "return list size= "+list.size());
       //return list;
     }
+
+    public void addProduct(final Context context ,Product p)
+    {
+        //Log.d(TAG,"TO Firestore event ="+ae.getTitle());
+        Map<String,Object> product = new HashMap<>();
+        //event.put("owner", user);
+        product.put(Cnst.ID,p.getId());
+        product.put(Cnst.TITLE, p.getTitle());
+        product.put(Cnst.PATH_IMAGE, p.getPathImage());
+       // product.put(Cnst.CATEGORY,p.getCategory());
+        product.put(Cnst.DESCRIPTION,p.getDescription());
+        product.put(Cnst.PRICE,p.getPrice());
+
+        //Log.d(Cnst.TAG,"add user ="+user);
+
+        mFirestore.collection("kodman.dev@gmail.com").document(p.getCategory())
+
+                .set(product)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(context,context.getResources().getString(R.string.succes_add),Toast.LENGTH_SHORT).show();
+                        // Log.d(TAG, "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(context,context.getResources().getString(R.string.failure_add),Toast.LENGTH_SHORT).show();
+                        //Log.w(TAG, "Error writing document", e);
+                    }
+                });
+    }
+
+    public void updateProduct(final Context context ,Product p)
+    {
+        Map<String,Object> product = new HashMap<>();
+
+        product.put(Cnst.ID,p.getId());
+        product.put(Cnst.TITLE, p.getTitle());
+        product.put(Cnst.CATEGORY,p.getCategory());
+        product.put(Cnst.PATH_IMAGE, p.getUri());
+        product.put(Cnst.DESCRIPTION,p.getDescription());
+        product.put(Cnst.PRICE,p.getPrice());
+
+        Log.d(Cnst.TAG,"update id ="+p.getId());
+
+        mFirestore.collection(user).document(p.getId()).update(product)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(context,context.getResources().getString(R.string.succes_update),Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(context,context.getResources().getString(R.string.failure_update),Toast.LENGTH_SHORT).show();
+                        // Log.w(TAG, "Error updating document", e);
+                    }
+                });
+    }
+
+    public void uploadImage(final Context context ,final Product p){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        StorageReference riversRef = storageRef.child(Cnst.IMAGES+Uri.parse(p.getUri()).getLastPathSegment());
+
+
+        p.setPathImage(riversRef.toString());
+
+        Log.d(Cnst.TAG,"path: "+p.getPathImage());
+
+        UploadTask  uploadTask = riversRef.putFile(Uri.parse(p.getUri()));
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+
+                Toast.makeText(context,context.getResources().getString(R.string.failure_upload),Toast.LENGTH_SHORT).show();
+                Log.d(Cnst.TAG,"onFailure upload:"+exception);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                addProduct(context,p);
+                Toast.makeText(context,context.getResources().getString(R.string.succes_upload),Toast.LENGTH_SHORT).show();
+                Log.d(Cnst.TAG,"onSucces upload");
+
+            }
+        });
+
+    }
 }

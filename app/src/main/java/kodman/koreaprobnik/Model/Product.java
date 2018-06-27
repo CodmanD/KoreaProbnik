@@ -112,6 +112,7 @@ public class Product extends BaseObservable implements Parcelable {
 
     public void setId(String id) {
         this.id = id;
+      //  notifyPropertyChanged(BR.id);
     }
 
     @Bindable
@@ -154,5 +155,10 @@ public class Product extends BaseObservable implements Parcelable {
     public void setPathImage(String pathImage) {
         this.pathImage = pathImage;
         notifyPropertyChanged(BR.pathImage);
+    }
+
+    @Override
+    public String toString() {
+        return "Product: id="+this.id+" | "+this.title+"\npath:  "+this.pathImage;
     }
 }
