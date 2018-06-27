@@ -20,7 +20,30 @@
         app:title="Korea Probnik"
         app:titleTextColor="#FFF"
 
-        />
+        >
+        <!--<ImageButton-->
+            <!--android:id="@+id/ibAdd"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/action_add"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:src="@android:drawable/ic_menu_add"-->
+            <!--android:clickable="true"-->
+            <!--android:visibility="visible"-->
+            <!--android:onClick="onClick"-->
+            <!--/>-->
+        <!--<ImageButton-->
+            <!--android:id="@+id/ibDelete"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/action_add"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:src="@android:drawable/ic_menu_delete"-->
+            <!--android:clickable="true"-->
+            <!--android:visibility="visible"-->
+            <!--android:onClick="onClick"-->
+            <!--/>-->
+    </android.support.v7.widget.Toolbar>
 <ProgressBar
     style="?android:attr/progressBarStyleLarge"
     android:layout_width="wrap_content"

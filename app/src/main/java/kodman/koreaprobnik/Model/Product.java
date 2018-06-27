@@ -34,8 +34,9 @@ public class Product extends BaseObservable implements Parcelable {
         dest.writeString(category);
         dest.writeString(description);
         dest.writeString(pathImage);
-        //dest.writeString();
+        dest.writeString(uri);
         dest.writeDouble(price);
+
     }
 
     @Override
@@ -48,6 +49,8 @@ public class Product extends BaseObservable implements Parcelable {
         title= in.readString();
         category = in.readString();
         description = in.readString();
+        pathImage=in.readString();
+        uri=in.readString();
         price = (float)in.readDouble();
 
     }
@@ -159,6 +162,6 @@ public class Product extends BaseObservable implements Parcelable {
 
     @Override
     public String toString() {
-        return "Product: id="+this.id+" | "+this.title+"\npath:  "+this.pathImage;
+        return "Product: id="+this.id+" | "+this.title+"\npath:  "+this.pathImage+"\ncategory: "+this.category;
     }
 }

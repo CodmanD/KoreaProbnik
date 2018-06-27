@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -89,20 +90,28 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private Product getProduct(){
 
-        product =(Product) getIntent().getParcelableExtra(Cnst.PRODUCT);
-
-        return product;}
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getProduct();
+
 
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit);
+        product =(Product) getIntent().getParcelableExtra(Cnst.PRODUCT);
+        if(product==null)
+        {
+            product=new Product();
+            Log.d(Cnst.TAG,"create new Product");
+        }
         binding.setProduct(product);
+
+        Log.d(Cnst.TAG,"onCreate uri"+binding.getProduct().getUri());
+        final File  localFile   =new File(binding.getProduct().getUri());
+        Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+        binding.iv.setImageBitmap(myBitmap);
+
         //  binding.setProduct(Demo.getUser());
 
 
@@ -110,9 +119,17 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinner.setAdapter(adapter);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(adapter);
+        if(product.getCategory()==null)
+        {
+            Log.d(Cnst.TAG,"Category product ="+product.getCategory()+"   |   "+binding.spinner.getItemAtPosition(0).toString());
+            product.setCategory(binding.spinner.getItemAtPosition(0).toString());
+
+        }
+
+        //Spinner spinner = (Spinner) findViewById(R.id.spinner);
+
 
         //spinner.setPrompt("TITLE CATEGORY");
 

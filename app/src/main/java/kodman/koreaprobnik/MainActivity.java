@@ -39,7 +39,7 @@ import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirestoreHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -71,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,26 +237,24 @@ public class MainActivity extends AppCompatActivity {
                 FirestoreHelper.getInstance(this).signOut();
                 return true;
             }
-            case R.id.category3: {
+            case R.id.actionAdd: {
 
-                Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Add", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(this, EditActivity.class);
+                //intent.putExtra(Cnst.PRODUCT, currentProduct);
+                startActivity(intent);
+                break;
+            }
+
+            case R.id.actionDelete: {
+
+                //Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
 
                 return true;
             }
 
-            case R.id.category4: {
 
-                Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
-
-                return true;
-            }
-
-            case R.id.category5: {
-
-                Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
-
-                return true;
-            }
         }
         return super.onOptionsItemSelected(item);
     }

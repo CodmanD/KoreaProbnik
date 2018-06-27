@@ -53,12 +53,13 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
  //   private List<Product> products;
     private FirestoreHelper fb;
     Product product;
+    boolean status=true;
 
     public AdapterProduct(Query query, List<Product> products, Context context, AppCompatActivity activity) {
 
 
         super(query);
-        Log.d(Cnst.TAG,"adaoter Constructor");
+      //  Log.d(Cnst.TAG,"adaoter Constructor");
         this.context = context;
 
        // this.products = products;
@@ -127,7 +128,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             FirebaseStorage storage = FirebaseStorage.getInstance();
            // StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
 
-            Log.d(Cnst.TAG,"Bind Product  pathImage= "+currentProduct);
+           // Log.d(Cnst.TAG,"Bind Product  pathImage= "+currentProduct);
 
             //StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/171045");
             // Загружаем изображения
@@ -141,6 +142,9 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                 gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
+                       currentProduct.setUri(localFile.getAbsolutePath());
+                       Log.d(Cnst.TAG,"adapter set URI "+currentProduct.getUri());
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
 
                         iv.setImageBitmap(myBitmap);
@@ -183,21 +187,23 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
             Bitmap bitmap = null;
             try {
-                Log.d(Cnst.TAG,"bitmap  try crweate");
+               // Log.d(Cnst.TAG,"bitmap  try crweate");
                 bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-                Log.d(Cnst.TAG,"bitmap crweate");
+
             } catch (Exception e) {
                 e.printStackTrace();
+              //  Log.d(Cnst.TAG,"Exception : ");
+
             }
 
             // Log.d("---", "setBitmap = " + bitmap);
             if (null != bitmap)
             {
                 iv.setImageBitmap(bitmap);
-                Log.d(Cnst.TAG,"bitmap set : "+bitmap);
+              //  Log.d(Cnst.TAG,"bitmap set : "+bitmap);
             }
             else {
-
+                iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
                 //iv.setImageDrawable(context.getDrawable(R.drawable.googleg_standard_color_18));
             }
 

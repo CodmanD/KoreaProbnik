@@ -109,6 +109,8 @@ public class FirestoreHelper {
         activity.startActivityForResult(signInIntent,Cnst.RC_SIGN_IN);
     }
 
+
+
 public void uploadFile(Uri file){
 
     StorageReference storageRef = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com");
@@ -379,7 +381,7 @@ public void downloadFile(String file,final ImageView iv)
         product.put(Cnst.DESCRIPTION,p.getDescription());
         product.put(Cnst.PRICE,p.getPrice());
 
-        //Log.d(Cnst.TAG,"add user ="+user);
+        Log.d(Cnst.TAG,"add product ="+p);
 
         mFirestore.collection("kodman.dev@gmail.com").document(p.getCategory())
 
@@ -461,4 +463,6 @@ public void downloadFile(String file,final ImageView iv)
         });
 
     }
+
+
 }
