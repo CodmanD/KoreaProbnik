@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 
+import android.databinding.OnRebindCallback;
+import android.databinding.ViewDataBinding;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,6 +46,7 @@ import butterknife.ButterKnife;
 import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirestoreHelper;
+import kodman.koreaprobnik.Util.UtilsApp;
 import kodman.koreaprobnik.databinding.ActivityEditBinding;
 
 /**
@@ -76,6 +80,8 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     final int RESULT_GALLERY = 1;
 
 
+    boolean isAddedImage=false;
+
     ActivityEditBinding binding;
     @Override
     public void onClick(View v) {
@@ -103,41 +109,61 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         if(product==null)
         {
             product=new Product();
+            binding.setProduct(product);
+
             Log.d(Cnst.TAG,"create new Product");
         }
-        binding.setProduct(product);
-
-        Log.d(Cnst.TAG,"onCreate uri"+binding.getProduct().getUri());
-        final File  localFile   =new File(binding.getProduct().getUri());
-        Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-        binding.iv.setImageBitmap(myBitmap);
-
-        //  binding.setProduct(Demo.getUser());
-
-
-        String[] data = getResources().getStringArray(R.array.categories);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        binding.spinner.setAdapter(adapter);
-
-        if(product.getCategory()==null)
+        else
         {
-            Log.d(Cnst.TAG,"Category product ="+product.getCategory()+"   |   "+binding.spinner.getItemAtPosition(0).toString());
-            product.setCategory(binding.spinner.getItemAtPosition(0).toString());
+            Log.d(Cnst.TAG,"get Product "+product);
+            binding.setProduct(product);
 
+            try {
+                final File  localFile   =new File(binding.getProduct().getUri());
+                Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                binding.iv.setImageBitmap(myBitmap);
+            } catch (Exception e) {
+               // e.printStackTrace();
+            }
         }
 
-        //Spinner spinner = (Spinner) findViewById(R.id.spinner);
 
 
-        //spinner.setPrompt("TITLE CATEGORY");
+
+        final String[] data = getResources().getStringArray(R.array.categories);
+
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
+
+        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,
+                android.R.layout.select_dialog_item, data);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinner.setAdapter(adapter);
+        binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                binding.getProduct().setCategory(data[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                binding.getProduct().setCategory(data[0]);
+            }
+        });
+
+        if(product.getCategory()!=null)
+        {
 
 
-        //binding.imageView.setOnClickListener(this);
-
+            int position=UtilsApp.setSpinner(data,product.getCategory());
+            //Log.d(Cnst.TAG,"Category product ="+product.getCategory()+"   |   "+binding.spinner.getItemAtPosition(0).toString()+" pos = "+position);
+            if(position>=0)
+                binding.spinner.setSelection(position);
+        }
+        else
+            {
+                binding.getProduct().setCategory(binding.spinner.getItemAtPosition(0).toString());
+            }
         setSupportActionBar(binding.toolbar);
-
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -147,6 +173,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                 onBackPressed();
             }
         });
+
     }
 
     @Override
@@ -159,8 +186,15 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionAdd: {
-
-                FirestoreHelper.getInstance(this).uploadImage(this,product);
+                binding.getProduct().setTitle(binding.etName.getText().toString());
+                binding.getProduct().setDescription(binding.etDescription.getText().toString());
+                binding.getProduct().setPrice(Float.valueOf(binding.etPrice.getText().toString()));
+                Log.d(Cnst.TAG,"Info binding p= "+binding.getProduct());
+                FirestoreHelper.getInstance(this).addProduct(this,binding.getProduct());
+                if(isAddedImage)
+                {
+                    FirestoreHelper.getInstance(this).uploadImage(this,binding.getProduct());
+                }
                 return true;
             }
             case R.id.actionUpdate: {
@@ -200,6 +234,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                   //   data.getData().getEncodedPath();
                         product.setUri(data.getData().toString());
+                        isAddedImage=true;
                        // product.setUri(selectedImage);
                       //  Log.d(Cnst.TAG, "setUri = " );
                     } catch (IOException e) {

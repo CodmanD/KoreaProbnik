@@ -12,11 +12,6 @@
     <string name="action_delete">Удалить</string>
     <string name="action_save">Сохранить</string>
 
-    <string name="category1">Крем</string>
-    <string name="category2">Патчи</string>
-    <string name="category3">Хрень</string>
-    <string name="category4">Вааще Хрень</string>
-    <string name="category5">Ыщё Хрень</string>
 
 
     <string name="name">Название:</string>
@@ -33,8 +28,32 @@
 
     <string name="spinner_title">Выберите категорию:  </string>
     <string-array name="categories">
-        <item>Крем</item>
-        <item>Маски</item>
-        <item>Патчи</item>
+        <item>Крем для глаз</item>
+        <item>Крем для лица</item>
+        <item>Патчи и маски</item>
+        <item>Тонер Эмульсия Эссенция</item>
+        <item>Миниатюры Наборы</item>
+        <item>Тонирующие средства</item>
+        <item>Очищение кожи</item>
+        <item>Пробники</item>
+        <item>Декоративная косметика</item>
+        <item>Уход за телом и волосами</item>
+        <item>Солнцезащитные средства</item>
+        <item>Скидки</item>
     </string-array>
+
+    <string name="category1">Крем для глаз</string>
+    <string name="category2">Крем для лица</string>
+    <string name="category3">Патчи и маски</string>
+    <string name="category4">Тонер Эмульсия Эссенция</string>
+    <string name="category5">Миниатюры Наборы</string>
+    <string name="category6">Тонирующие средства</string>
+    <string name="category7">Очищение кожи</string>
+    <string name="category8">Пробники</string>
+    <string name="category9">Декоративная косметика</string>
+    <string name="category10">Уход за телом и волосами</string>
+    <string name="category11">Солнцезащитные средства</string>
+    <string name="category12">Скидки</string>
+
+
 </resources>

@@ -22,4 +22,33 @@
         android:id="@+id/category5"
         android:orderInCategory="100"
         android:title="@string/category5" />
+    <item
+        android:id="@+id/category6"
+        android:orderInCategory="100"
+        android:title="@string/category6" />
+    <item
+        android:id="@+id/category7"
+        android:orderInCategory="100"
+        android:title="@string/category7" />
+    <item
+        android:id="@+id/category8"
+        android:orderInCategory="100"
+        android:title="@string/category8" />
+    <item
+        android:id="@+id/category9"
+        android:orderInCategory="100"
+        android:title="@string/category9" />
+    <item
+        android:id="@+id/category10"
+        android:orderInCategory="100"
+        android:title="@string/category10" />
+    <item
+        android:id="@+id/category11"
+        android:orderInCategory="100"
+        android:title="@string/category11" />
+    <item
+        android:id="@+id/category12"
+        android:orderInCategory="100"
+        android:title="@string/category12" />
+
 </menu>

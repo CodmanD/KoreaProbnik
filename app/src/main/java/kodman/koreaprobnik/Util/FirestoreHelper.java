@@ -24,12 +24,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -68,6 +72,7 @@ public class FirestoreHelper {
     private static FirestoreHelper instance;
     static FirebaseStorage storage;
 
+    static FirebaseAnalytics mFbAnalytics;//=FirebaseAnalytics.getInstance();
 
     FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
 
@@ -83,7 +88,8 @@ public class FirestoreHelper {
 
             instance = new FirestoreHelper(activity);
             storage  = FirebaseStorage.getInstance();
-
+            mFbAnalytics=FirebaseAnalytics.getInstance(activity.getBaseContext());
+           /// mFbAnalytics.logEvent();
         }
         return instance;
 
@@ -371,21 +377,35 @@ public void downloadFile(String file,final ImageView iv)
 
     public void addProduct(final Context context ,Product p)
     {
-        //Log.d(TAG,"TO Firestore event ="+ae.getTitle());
+        if(p.getUri()!=null) {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            StorageReference riversRef = storageRef.child(Cnst.IMAGES + Uri.parse(p.getUri()).getLastPathSegment());
+            p.setPathImage(riversRef.toString());
+        }
+
+        Log.d(TAG,"TO Firestore product ="+p);
+       // p.setPathImage();
         Map<String,Object> product = new HashMap<>();
         //event.put("owner", user);
         product.put(Cnst.ID,p.getId());
         product.put(Cnst.TITLE, p.getTitle());
         product.put(Cnst.PATH_IMAGE, p.getPathImage());
-       // product.put(Cnst.CATEGORY,p.getCategory());
+        product.put(Cnst.CATEGORY,p.getCategory());
         product.put(Cnst.DESCRIPTION,p.getDescription());
         product.put(Cnst.PRICE,p.getPrice());
 
-        Log.d(Cnst.TAG,"add product ="+p);
+        String id=p.getId();
+        if(id==null)
+            id=getId();
+      DocumentReference reference= mFirestore.collection(Cnst.PRODUCT).document(id);
 
-        mFirestore.collection("kodman.dev@gmail.com").document(p.getCategory())
+      //reference.getId();
+        Log.d(Cnst.TAG,"add product ="+reference.getId());
 
-                .set(product)
+      // mFirestore.collection("kodman.dev@gmail.com").document(p.getCategory())
+
+        reference.set(product)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -400,6 +420,22 @@ public void downloadFile(String file,final ImageView iv)
                         //Log.w(TAG, "Error writing document", e);
                     }
                 });
+    }
+
+    public Query getQuery(String category)
+    {
+        Query   mQuery;
+        if(category.equals("all"))
+        {  mQuery=  mFirestore.collection(Cnst.PRODUCT)
+                    .orderBy("title", Query.Direction.DESCENDING)
+                    .limit(100);
+        }
+        else
+            mQuery=  mFirestore.collection(Cnst.PRODUCT)
+                 .whereEqualTo(Cnst.CATEGORY,category)
+                .orderBy("title", Query.Direction.DESCENDING)
+                .limit(100);
+        return mQuery;
     }
 
     public void updateProduct(final Context context ,Product p)
@@ -455,7 +491,7 @@ public void downloadFile(String file,final ImageView iv)
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                addProduct(context,p);
+                //addProduct(context,p);
                 Toast.makeText(context,context.getResources().getString(R.string.succes_upload),Toast.LENGTH_SHORT).show();
                 Log.d(Cnst.TAG,"onSucces upload");
 
@@ -464,5 +500,11 @@ public void downloadFile(String file,final ImageView iv)
 
     }
 
+    public String getId(){
+
+
+
+        return String.valueOf(System.currentTimeMillis());
+    }
 
 }

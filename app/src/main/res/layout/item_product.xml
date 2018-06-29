@@ -10,9 +10,9 @@ android:background="@drawable/item_recycler"
         android:id="@+id/iv"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:scaleType="center"
-
-        android:src="@drawable/default_product" />
+        android:scaleType="fitCenter"
+android:padding="3dp"
+        android:src="@drawable/gift" />
 
     <LinearLayout
         android:layout_width="match_parent"

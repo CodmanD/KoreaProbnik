@@ -54,16 +54,17 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
     private FirestoreHelper fb;
     Product product;
     boolean status=true;
+    String category;
 
-    public AdapterProduct(Query query, List<Product> products, Context context, AppCompatActivity activity) {
+    public AdapterProduct( List<Product> products, Context context, AppCompatActivity activity,String category) {
 
-
-        super(query);
+        //fb = FirestoreHelper.getInstance(activity);
+        super(FirestoreHelper.getInstance(activity).getQuery(category));
       //  Log.d(Cnst.TAG,"adaoter Constructor");
         this.context = context;
-
+        this.category=category;
        // this.products = products;
-        fb = FirestoreHelper.getInstance(activity);
+
     }
 
 
@@ -107,7 +108,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
 
             currentProduct = snapshot.toObject(Product.class);
-           // currentProduct.setId(snapshot.getId());
+            currentProduct.setId(snapshot.getId());
 
            // currentProduct.setPathImage(snapshot.g.getData().get(Cnst.IMAGES).toString());
             //Log.d(Cnst.TAG,"bind : "+snapshot.getId());
@@ -133,7 +134,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             //StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/171045");
             // Загружаем изображения
 
-
+            iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
 
             try {
                    StorageReference gsReference = storage.getReferenceFromUrl(currentProduct.getPathImage());
@@ -148,19 +149,27 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
 
                         iv.setImageBitmap(myBitmap);
+                        if(myBitmap==null)
+                        {
+
+                        }
                      //   Log.d(Cnst.TAG,"onSucces : "+taskSnapshot.getStorage().getName());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                     //   iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
                         Log.d(Cnst.TAG,"Faillure : "+e.getMessage());
                     }
                 });
             } catch (IOException e) {
                 e.printStackTrace();
+
+               // iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
             }
             catch (Exception e) {
                 e.printStackTrace();
+              //  iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
             }
 
 //            Glide.with(context)
@@ -174,7 +183,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
 
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             //this.id = (TextView) itemView.findViewById(R.id.tvItemID);
             this.tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
@@ -187,8 +196,8 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
             Bitmap bitmap = null;
             try {
-               // Log.d(Cnst.TAG,"bitmap  try crweate");
-                bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+                Log.d(Cnst.TAG,"bitmap  try crweate");
+              //  bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -199,11 +208,12 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             // Log.d("---", "setBitmap = " + bitmap);
             if (null != bitmap)
             {
-                iv.setImageBitmap(bitmap);
+               // iv.setImageBitmap(bitmap);
               //  Log.d(Cnst.TAG,"bitmap set : "+bitmap);
             }
             else {
-                iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
+                 // Log.d(Cnst.TAG,"bitmap DEFAULT pos="+ currentProduct);
+               // iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
                 //iv.setImageDrawable(context.getDrawable(R.drawable.googleg_standard_color_18));
             }
 
@@ -213,12 +223,37 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
                     Toast.makeText(context, "CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(context, EditActivity.class);
+
+                    //currentProduct.setCategory("Патчи");
                     intent.putExtra(Cnst.PRODUCT, currentProduct);
+Log.d(Cnst.TAG," put product :"+currentProduct.hashCode());
 
                     context.startActivity(intent);
                 }
             });
 
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    Log.d(Cnst.TAG,"onLongClick");
+                    if(itemView.isClickable())
+                    {
+                        itemView.setClickable(false);
+                        itemView.setBackgroundResource(R.drawable.item_recycler_selected);
+                        //itemView.setBackgroundColor(context.getResources().getColor(R.color.colorSelected));
+                    }
+                    else
+                    {
+                        itemView.setClickable(true);
+                        itemView.setBackgroundResource(R.drawable.item_recycler);
+                    }
+
+                    return true;
+                }
+
+
+            });
 
         }
     }

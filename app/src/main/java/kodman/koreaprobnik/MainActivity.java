@@ -58,9 +58,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FirestoreHelper mFirestoreHelper;
 
     List<Product> products = new ArrayList<>(100);
-    AdapterProduct adapter;
+    AdapterProduct adapter=null;
 
-    private Query mQuery;
+    String category="all";
+
+
 
     public void updateData(){
 
@@ -86,12 +88,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mFirestore=FirebaseFirestore.getInstance();
-        mFirestoreHelper = FirestoreHelper.getInstance(MainActivity.this);
+      //  mFirestore=FirebaseFirestore.getInstance();
+       // mFirestoreHelper = FirestoreHelper.getInstance(MainActivity.this);
 
-        mQuery=  mFirestore.collection("kodman.dev@gmail.com")
-                .orderBy("title", Query.Direction.DESCENDING)
-                .limit(100);
+
 
        // addListToFireStore();
         setSupportActionBar(toolbar);
@@ -113,10 +113,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
+                        category=menuItem.getTitle().toString();
+                        adapter = new AdapterProduct(products, MainActivity.this, MainActivity.this,category){
+
+                            @Override
+                            protected void onDataChanged() {
+
+                                // Покажи/спрячь данные в UI если запрос возвращается пустым
+                                if (getItemCount() == 0) {
+                                    recyclerView.setVisibility(View.GONE);
+                                    //mEmptyView.setVisibility(View.VISIBLE);
+
+                                } else {
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    //mEmptyView.setVisibility(View.GONE);
+                                }
+                            }
+
+                            @Override
+                            protected void onError(FirebaseFirestoreException e) {
+                                // Покажи снакбар в случаи ошибки
+                                Snackbar.make(findViewById(android.R.id.content),
+                                        "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
+                            }
+                        };
+                        adapter.startListening();
+                        recyclerView.setAdapter(adapter);
                         // close drawer when item is tapped
                         // mDrawerLayout.closeDrawers();
 
-                        Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
 
@@ -129,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(mLayoutManager);
 
 
-       adapter = new AdapterProduct(mQuery,products, this, this){
+       adapter = new AdapterProduct(products, this, this,category){
 
            @Override
            protected void onDataChanged() {
@@ -156,6 +182,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setAdapter(adapter);
     }
 
+    private void showCategory(String category){
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -243,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Intent intent = new Intent(this, EditActivity.class);
                 //intent.putExtra(Cnst.PRODUCT, currentProduct);
+                intent.putExtra(Cnst.NEXT_ID,1);
                 startActivity(intent);
                 break;
             }

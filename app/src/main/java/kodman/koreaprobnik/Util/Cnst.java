@@ -22,4 +22,5 @@ public  final class Cnst {
 
 
     public static String IMAGES="images/";
+    public static String NEXT_ID="nextId";
 }
