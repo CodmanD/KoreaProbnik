@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             protected void onError(FirebaseFirestoreException e) {
+                                Log.d(Cnst.TAG,"Firestore Exception"+e.getMessage());
                                 // Покажи снакбар в случаи ошибки
                                 Snackbar.make(findViewById(android.R.id.content),
                                         "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
@@ -279,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.actionDelete: {
 
+                adapter.delProduct();
                 //Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
 
                 return true;

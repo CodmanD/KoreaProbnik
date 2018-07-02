@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -43,6 +44,7 @@ import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import kodman.koreaprobnik.Adapter.AdapterProduct;
 import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirestoreHelper;
@@ -76,13 +78,14 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     EditText etPrice;
     @BindView(R.id.etDescription)
     EditText etDescription;
-    Product product ;
+    Product product;
     final int RESULT_GALLERY = 1;
 
 
-    boolean isAddedImage=false;
+    boolean isAddedImage = false;
 
     ActivityEditBinding binding;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -97,44 +100,39 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
-
-        binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit);
-        product =(Product) getIntent().getParcelableExtra(Cnst.PRODUCT);
-        if(product==null)
-        {
-            product=new Product();
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit);
+        product = (Product) getIntent().getParcelableExtra(Cnst.PRODUCT);
+        if (product == null) {
+            product = new Product();
             binding.setProduct(product);
 
-            Log.d(Cnst.TAG,"create new Product");
-        }
-        else
-        {
-            Log.d(Cnst.TAG,"get Product "+product);
+            Log.d(Cnst.TAG, "create new Product");
+        } else {
+            Log.d(Cnst.TAG, "get Product " + product);
             binding.setProduct(product);
 
             try {
-                final File  localFile   =new File(binding.getProduct().getUri());
-                Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                binding.iv.setImageBitmap(myBitmap);
+                final File localFile = new File(binding.getProduct().getPathImage());
+                Glide.with(this)
+                        .load(localFile)
+                        .into(binding.iv);
+
             } catch (Exception e) {
-               // e.printStackTrace();
+                // e.printStackTrace();
             }
         }
-
-
 
 
         final String[] data = getResources().getStringArray(R.array.categories);
 
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
 
-        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.select_dialog_item, data);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinner.setAdapter(adapter);
@@ -150,19 +148,16 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        if(product.getCategory()!=null)
-        {
+        if (product.getCategory() != null) {
 
 
-            int position=UtilsApp.setSpinner(data,product.getCategory());
+            int position = UtilsApp.setSpinner(data, product.getCategory());
             //Log.d(Cnst.TAG,"Category product ="+product.getCategory()+"   |   "+binding.spinner.getItemAtPosition(0).toString()+" pos = "+position);
-            if(position>=0)
+            if (position >= 0)
                 binding.spinner.setSelection(position);
+        } else {
+            binding.getProduct().setCategory(binding.spinner.getItemAtPosition(0).toString());
         }
-        else
-            {
-                binding.getProduct().setCategory(binding.spinner.getItemAtPosition(0).toString());
-            }
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -189,18 +184,18 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                 binding.getProduct().setTitle(binding.etName.getText().toString());
                 binding.getProduct().setDescription(binding.etDescription.getText().toString());
                 binding.getProduct().setPrice(Float.valueOf(binding.etPrice.getText().toString()));
-                Log.d(Cnst.TAG,"Info binding p= "+binding.getProduct());
-                FirestoreHelper.getInstance(this).addProduct(this,binding.getProduct());
-                if(isAddedImage)
-                {
-                    FirestoreHelper.getInstance(this).uploadImage(this,binding.getProduct());
+                Log.d(Cnst.TAG, "Info binding p= " + binding.getProduct());
+
+                if (isAddedImage) {
+                    FirestoreHelper.getInstance(this).uploadImage(this, binding.getProduct());
                 }
+                FirestoreHelper.getInstance(this).addProduct(this, binding.getProduct());
                 return true;
             }
             case R.id.actionUpdate: {
-                 Log.d(Cnst.TAG,"Info binding p= "+binding.getProduct().getId()+" | "+binding.getProduct().getTitle());
-                Log.d(Cnst.TAG,"Info p= "+product.getId()+" | "+product.getTitle());
-                //FirestoreHelper.getInstance(this).uploadImage(this,product);
+                Log.d(Cnst.TAG, "Info binding p= " + binding.getProduct().getId() + " | " + binding.getProduct().getTitle());
+                Log.d(Cnst.TAG, "Info p= " + product.getId() + " | " + product.getTitle());
+
                 return true;
             }
         }
@@ -220,6 +215,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         }
         return result;
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -232,18 +228,18 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                     Uri selectedImage = data.getData();
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                  //   data.getData().getEncodedPath();
-                        product.setUri(data.getData().toString());
-                        isAddedImage=true;
-                       // product.setUri(selectedImage);
-                      //  Log.d(Cnst.TAG, "setUri = " );
+                        //   data.getData().getEncodedPath();
+                        product.setPathImage(data.getData().toString());
+                        isAddedImage = true;
+                        // product.setUri(selectedImage);
+                        //  Log.d(Cnst.TAG, "setUri = " );
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.d("---", "setUri = " + selectedImage);
                     }
 
-                   // Log.d("---", "setBitmap = " + bitmap);
-                     binding.iv.setImageBitmap(bitmap);
+                    // Log.d("---", "setBitmap = " + bitmap);
+                    binding.iv.setImageBitmap(bitmap);
                 }
 
 

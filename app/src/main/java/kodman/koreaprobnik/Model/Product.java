@@ -162,6 +162,6 @@ public class Product extends BaseObservable implements Parcelable {
 
     @Override
     public String toString() {
-        return "Product: id="+this.id+" | "+this.title+"\npath:  "+this.pathImage+"\ncategory: "+this.category;
+        return "Product: id="+this.id+" | "+this.title+"\npath:  "+this.pathImage+"\ncategory: "+this.category+"\nuri:"+this.getUri();
     }
 }

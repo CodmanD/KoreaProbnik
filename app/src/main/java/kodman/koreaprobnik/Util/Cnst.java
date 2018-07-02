@@ -16,6 +16,7 @@ public  final class Cnst {
     public static String TITLE="title";
     public static String CATEGORY="category";
     public static String DESCRIPTION="description";
+    public static String URI_IMAGE="uri";
     public static String PATH_IMAGE="pathImage";
     public static String ID="id";
     public static String PRICE="price";

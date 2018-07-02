@@ -33,6 +33,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import kodman.koreaprobnik.EditActivity;
@@ -55,6 +56,16 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
     Product product;
     boolean status=true;
     String category;
+    ArrayList listForRemoved= new ArrayList();
+    AppCompatActivity activity;
+
+    public void delProduct(){
+        for(int i=0;i<listForRemoved.size();i++)
+        {
+         Log.e(Cnst.TAG,"DEL:"+listForRemoved.get(i));
+         FirestoreHelper.getInstance(activity).removeProduct(String.valueOf(listForRemoved.get(i)));
+        }
+    }
 
     public AdapterProduct( List<Product> products, Context context, AppCompatActivity activity,String category) {
 
@@ -63,6 +74,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
       //  Log.d(Cnst.TAG,"adaoter Constructor");
         this.context = context;
         this.category=category;
+        this.activity=activity;
        // this.products = products;
 
     }
@@ -110,6 +122,16 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             currentProduct = snapshot.toObject(Product.class);
             currentProduct.setId(snapshot.getId());
 
+            if(!listForRemoved.contains(currentProduct.getId()))
+            {
+                itemView.setClickable(true);
+                itemView.setBackgroundResource(R.drawable.item_recycler);
+            }
+            else{
+                itemView.setClickable(false);
+                itemView.setBackgroundResource(R.drawable.item_recycler_selected);
+            }
+            Log.d(Cnst.TAG,"bind:"+currentProduct+"\n----------------------------");
            // currentProduct.setPathImage(snapshot.g.getData().get(Cnst.IMAGES).toString());
             //Log.d(Cnst.TAG,"bind : "+snapshot.getId());
             Resources resources = itemView.getResources();
@@ -121,13 +143,9 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             //  viewHolder.tvDescription.setText(product.getDescription());
             tvPrice.setText(String.valueOf( currentProduct.getPrice()));
             tvDescription.setText(String.valueOf( currentProduct.getDescription()));
-            // Log.d(Cnst.TAG, "onBindViewHolder event = " + product.getTitle()+" URI = "+product.getUri());
-           // uri=product.getUri();
 
-          //  Log.d(Cnst.TAG,"Bind Product = "+currentProduct.getUri());
-            // String file = product.getPathImage();
             FirebaseStorage storage = FirebaseStorage.getInstance();
-           // StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
+          // final StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
 
            // Log.d(Cnst.TAG,"Bind Product  pathImage= "+currentProduct);
 
@@ -137,18 +155,26 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
 
             try {
-                   StorageReference gsReference = storage.getReferenceFromUrl(currentProduct.getPathImage());
-                  final File  localFile   = File.createTempFile("images", "jpg");
+                 final  StorageReference gsReference = storage.getReferenceFromUrl(currentProduct.getUri());
+                  final File  localFile   = File.createTempFile("images", ".jpg");
 
-                gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                      gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 
-                       currentProduct.setUri(localFile.getAbsolutePath());
+                       currentProduct.setPathImage(localFile.getAbsolutePath());
+                        currentProduct.setUri(gsReference.toString());
                        Log.d(Cnst.TAG,"adapter set URI "+currentProduct.getUri());
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
 
-                        iv.setImageBitmap(myBitmap);
+
+                        Glide.with(context)
+                                .load(localFile)
+                                // .using(new FirebaseImageLoader())
+                                //   .load( "gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")
+                                .into(iv);
+
+                      //  iv.setImageBitmap(myBitmap);
                         if(myBitmap==null)
                         {
 
@@ -159,7 +185,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                     @Override
                     public void onFailure(@NonNull Exception e) {
                      //   iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
-                        Log.d(Cnst.TAG,"Faillure : "+e.getMessage());
+                        Log.d(Cnst.TAG,"Faillure : "+e.getMessage()+": "+currentProduct.getTitle());
                     }
                 });
             } catch (IOException e) {
@@ -172,12 +198,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
               //  iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
             }
 
-//            Glide.with(context)
-//
-//                    .load(httpsReference)
-//                   // .using(new FirebaseImageLoader())
-//                 //   .load( "gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")
-//                    .into(iv);
+
 
         }
 
@@ -185,6 +206,8 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
         public ViewHolder(final View itemView) {
             super(itemView);
+
+
             //this.id = (TextView) itemView.findViewById(R.id.tvItemID);
             this.tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             this.tvDescription = (TextView) itemView.findViewById(R.id.tvDescription);
@@ -226,7 +249,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
                     //currentProduct.setCategory("Патчи");
                     intent.putExtra(Cnst.PRODUCT, currentProduct);
-Log.d(Cnst.TAG," put product :"+currentProduct.hashCode());
+                    Log.d(Cnst.TAG," put product :"+currentProduct.hashCode());
 
                     context.startActivity(intent);
                 }
@@ -239,12 +262,14 @@ Log.d(Cnst.TAG," put product :"+currentProduct.hashCode());
                     Log.d(Cnst.TAG,"onLongClick");
                     if(itemView.isClickable())
                     {
+                        listForRemoved.add(currentProduct.getId());
                         itemView.setClickable(false);
                         itemView.setBackgroundResource(R.drawable.item_recycler_selected);
                         //itemView.setBackgroundColor(context.getResources().getColor(R.color.colorSelected));
                     }
                     else
                     {
+                        listForRemoved.remove(currentProduct.getId());
                         itemView.setClickable(true);
                         itemView.setBackgroundResource(R.drawable.item_recycler);
                     }

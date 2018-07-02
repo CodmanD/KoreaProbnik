@@ -252,6 +252,8 @@ public void downloadFile(String file,final ImageView iv)
     }
 
 
+
+
     public void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
@@ -375,22 +377,28 @@ public void downloadFile(String file,final ImageView iv)
       //return list;
     }
 
+    public void removeProduct(String id)
+    {
+        DocumentReference reference= mFirestore.collection(Cnst.PRODUCT).document(id);
+        reference.delete();
+    }
+
     public void addProduct(final Context context ,Product p)
     {
-        if(p.getUri()!=null) {
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReference();
-            StorageReference riversRef = storageRef.child(Cnst.IMAGES + Uri.parse(p.getUri()).getLastPathSegment());
-            p.setPathImage(riversRef.toString());
-        }
+//        if(p.getUri()!=null) {
+//            FirebaseStorage storage = FirebaseStorage.getInstance();
+//            StorageReference storageRef = storage.getReference();
+//            StorageReference riversRef = storageRef.child(Cnst.IMAGES + Uri.parse(p.getUri()).getLastPathSegment());
+//            p.setUri(riversRef.toString());
+//        }
 
-        Log.d(TAG,"TO Firestore product ="+p);
+        Log.d(TAG,"Firestore ADD  ="+p);
        // p.setPathImage();
         Map<String,Object> product = new HashMap<>();
         //event.put("owner", user);
         product.put(Cnst.ID,p.getId());
         product.put(Cnst.TITLE, p.getTitle());
-        product.put(Cnst.PATH_IMAGE, p.getPathImage());
+        product.put(Cnst.URI_IMAGE, p.getUri());
         product.put(Cnst.CATEGORY,p.getCategory());
         product.put(Cnst.DESCRIPTION,p.getDescription());
         product.put(Cnst.PRICE,p.getPrice());
@@ -445,11 +453,11 @@ public void downloadFile(String file,final ImageView iv)
         product.put(Cnst.ID,p.getId());
         product.put(Cnst.TITLE, p.getTitle());
         product.put(Cnst.CATEGORY,p.getCategory());
-        product.put(Cnst.PATH_IMAGE, p.getUri());
+        product.put(Cnst.URI_IMAGE, p.getUri());
         product.put(Cnst.DESCRIPTION,p.getDescription());
         product.put(Cnst.PRICE,p.getPrice());
 
-        Log.d(Cnst.TAG,"update id ="+p.getId());
+       // Log.d(Cnst.TAG,"update id ="+p.getId());
 
         mFirestore.collection(user).document(p.getId()).update(product)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -471,14 +479,14 @@ public void downloadFile(String file,final ImageView iv)
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
 
-        StorageReference riversRef = storageRef.child(Cnst.IMAGES+Uri.parse(p.getUri()).getLastPathSegment());
+        StorageReference riversRef = storageRef.child(Cnst.IMAGES+Uri.parse(p.getPathImage()).getLastPathSegment());
 
 
-        p.setPathImage(riversRef.toString());
+        p.setUri(riversRef.toString());
 
         Log.d(Cnst.TAG,"path: "+p.getPathImage());
 
-        UploadTask  uploadTask = riversRef.putFile(Uri.parse(p.getUri()));
+        UploadTask  uploadTask = riversRef.putFile(Uri.parse(p.getPathImage()));
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -501,10 +509,7 @@ public void downloadFile(String file,final ImageView iv)
     }
 
     public String getId(){
-
-
-
-        return String.valueOf(System.currentTimeMillis());
+         return String.valueOf(System.currentTimeMillis());
     }
 
 }
