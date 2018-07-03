@@ -192,12 +192,8 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                 FirestoreHelper.getInstance(this).addProduct(this, binding.getProduct());
                 return true;
             }
-            case R.id.actionUpdate: {
-                Log.d(Cnst.TAG, "Info binding p= " + binding.getProduct().getId() + " | " + binding.getProduct().getTitle());
-                Log.d(Cnst.TAG, "Info p= " + product.getId() + " | " + product.getTitle());
 
-                return true;
-            }
+
         }
         return super.onOptionsItemSelected(item);
     }

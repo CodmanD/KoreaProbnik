@@ -380,7 +380,12 @@ public void downloadFile(String file,final ImageView iv)
     public void removeProduct(String id)
     {
         DocumentReference reference= mFirestore.collection(Cnst.PRODUCT).document(id);
-        reference.delete();
+        reference.delete().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(Cnst.TAG,"Failure delete: "+e.getMessage());
+            }
+        });
     }
 
     public void addProduct(final Context context ,Product p)
