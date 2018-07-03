@@ -28,6 +28,7 @@
 
     <string name="spinner_title">Выберите категорию:  </string>
     <string-array name="categories">
+
         <item>Крем для глаз</item>
         <item>Крем для лица</item>
         <item>Патчи и маски</item>
@@ -42,6 +43,7 @@
         <item>Скидки</item>
     </string-array>
 
+    <string name="category0">Все товары</string>
     <string name="category1">Крем для глаз</string>
     <string name="category2">Крем для лица</string>
     <string name="category3">Патчи и маски</string>

@@ -271,7 +271,7 @@ public void downloadFile(String file,final ImageView iv)
                             FirebaseUser user = mAuth.getCurrentUser();
 
                             // Log.d(TAG, "signInWithCredential:success"+user.getEmail());
-                            Snackbar.make(activity.findViewById(R.id.root), "Authentication success.", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.root), "Authentication success."+mAuth.getCurrentUser().getEmail(), Snackbar.LENGTH_SHORT).show();
 
                             // SharedPreferences.Editor sPEditor= PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
                             //sPEditor.putString(Cnst.Email,user.getEmail());
@@ -433,8 +433,10 @@ public void downloadFile(String file,final ImageView iv)
     public Query getQuery(String category)
     {
         Query   mQuery;
-        if(category.equals("all"))
-        {  mQuery=  mFirestore.collection(Cnst.PRODUCT)
+        if(category.equals(context.getResources().getString(R.string.category0)))
+        {
+            Log.d(Cnst.TAG,"All");
+            mQuery=  mFirestore.collection(Cnst.PRODUCT)
                     .orderBy("title", Query.Direction.DESCENDING)
                     .limit(100);
         }

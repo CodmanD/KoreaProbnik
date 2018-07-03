@@ -60,9 +60,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<Product> products = new ArrayList<>(100);
     AdapterProduct adapter=null;
 
-    String category="all";
+    String category;//="all";
 
 
+    boolean isAdmin=false;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Cnst.CATEGORY,category);
+    }
 
     public void updateData(){
 
@@ -86,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(Cnst.TAG,"onCreate");
         super.onCreate(savedInstanceState);
+    if(savedInstanceState!=null)
+            category=savedInstanceState.getString(Cnst.CATEGORY);
+        else
+        category=getResources().getString(R.string.category0);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
       //  mFirestore=FirebaseFirestore.getInstance();
@@ -114,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
                         category=menuItem.getTitle().toString();
+
                         adapter = new AdapterProduct(products, MainActivity.this, MainActivity.this,category){
 
                             @Override
@@ -134,10 +151,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             protected void onError(FirebaseFirestoreException e) {
                                 Log.d(Cnst.TAG,"Firestore Exception"+e.getMessage());
                                 // Покажи снакбар в случаи ошибки
-                                Snackbar.make(findViewById(android.R.id.content),
-                                        "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
+                              //  Snackbar.make(findViewById(android.R.id.content),
+                               //         "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
                             }
+
+
+
                         };
+
+                            mDrawerLayout.closeDrawers();
+
+
+
                         adapter.startListening();
                         recyclerView.setAdapter(adapter);
                         // close drawer when item is tapped
@@ -175,8 +200,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
            @Override
            protected void onError(FirebaseFirestoreException e) {
                // Покажи снакбар в случаи ошибки
-               Snackbar.make(findViewById(android.R.id.content),
-                       "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
+             //  Snackbar.make(findViewById(android.R.id.content),
+             //          "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
            }
        };
         adapter.startListening();
