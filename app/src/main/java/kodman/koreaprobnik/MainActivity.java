@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     AdapterProduct adapter=null;
 
     String category;//="all";
-
+    private Menu menu;
 
     boolean isAdmin=false;
     @Override
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         menuItem.setChecked(true);
                         category=menuItem.getTitle().toString();
 
-                        adapter = new AdapterProduct(products, MainActivity.this, MainActivity.this,category){
+                        adapter = new AdapterProduct(products, MainActivity.this, MainActivity.this,category,isAdmin){
 
                             @Override
                             protected void onDataChanged() {
@@ -181,29 +181,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(mLayoutManager);
 
 
-       adapter = new AdapterProduct(products, this, this,category){
+       setAdapter(isAdmin);
 
-           @Override
-           protected void onDataChanged() {
+    }
 
-               // Покажи/спрячь данные в UI если запрос возвращается пустым
-               if (getItemCount() == 0) {
-                   recyclerView.setVisibility(View.GONE);
-                   //mEmptyView.setVisibility(View.VISIBLE);
+    private void setAdapter(boolean rules){
+      adapter=  new AdapterProduct(products, this, this,category,rules){
 
-               } else {
-                   recyclerView.setVisibility(View.VISIBLE);
-                   //mEmptyView.setVisibility(View.GONE);
-               }
-           }
+            @Override
+            protected void onDataChanged() {
 
-           @Override
-           protected void onError(FirebaseFirestoreException e) {
-               // Покажи снакбар в случаи ошибки
-             //  Snackbar.make(findViewById(android.R.id.content),
-             //          "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
-           }
-       };
+                // Покажи/спрячь данные в UI если запрос возвращается пустым
+                if (getItemCount() == 0) {
+                    recyclerView.setVisibility(View.GONE);
+                    //mEmptyView.setVisibility(View.VISIBLE);
+
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    //mEmptyView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            protected void onError(FirebaseFirestoreException e) {
+                // Покажи снакбар в случаи ошибки
+                //  Snackbar.make(findViewById(android.R.id.content),
+                //          "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
+            }
+        };
         adapter.startListening();
         recyclerView.setAdapter(adapter);
     }
@@ -256,25 +261,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        if(!isAdmin)
+        {   menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(false);
+        }
+        this.menu=menu;
         return true;
     }
 
-    private void addListToFireStore() {
-        mFirestoreHelper.downloadListFirestore("kodman.dev@gmail.com",products);
-//        if (products.size() == 0){
-//            //UidGenerator ug = new UidGenerator(null, "uidGen");
-//            for (int i = 0; i < 10; i++) {
-//                products.add(new Product("product " + i));
-//                products.get(i).setId(String.valueOf(i));
-//              //  products.get(i).setUri(Uri.parse(""));
-//                mFirestoreHelper.uploadProduct(products.get(i),"kodman.dev@gmail.com");
-//            }
-//        }
-//        else{
-//            Toast.makeText(this,"Reeead from FS",Toast.LENGTH_SHORT).show();
-//        }
 
+    public void setAdmin(boolean isAdmin)
+    {
+        this.isAdmin=isAdmin;
+        if(isAdmin)
+        {
+            menu.getItem(0).setVisible(true);
+            menu.getItem(1).setVisible(true);
+            setAdapter(isAdmin);
+            //adapter.setClickAdmin(isAdmin);
+            Log.d(Cnst.TAG,"MainActivity setAdmin");
+        }
+        else{
+            menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(false);
+            setAdapter(isAdmin);
+        }
 
+        //menu.getItem(0).setVisible(true);
     }
 
     @Override

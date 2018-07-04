@@ -12,8 +12,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -78,6 +80,7 @@ public class FirestoreHelper {
 
     private String user="";
 
+
   final  private Context context;
 
 
@@ -110,6 +113,7 @@ public class FirestoreHelper {
     }
 
     public void signIn() {
+
         mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         activity.startActivityForResult(signInIntent,Cnst.RC_SIGN_IN);
@@ -227,7 +231,19 @@ public void downloadFile(String file,final ImageView iv)
         // Log.d(TAG, "Sign Out complete");
         mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
         // Google sign out
-        mGoogleSignInClient.signOut().addOnCompleteListener(activity,
+        mGoogleSignInClient.signOut().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Snackbar.make(activity.findViewById(R.id.root), "Logout success", Snackbar.LENGTH_SHORT).show();
+
+                ((MainActivity)activity).setAdmin(false);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Snackbar.make(activity.findViewById(R.id.root), "Logout failure : "+e.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        }).addOnCompleteListener(activity,
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -273,6 +289,10 @@ public void downloadFile(String file,final ImageView iv)
                             // Log.d(TAG, "signInWithCredential:success"+user.getEmail());
                             Snackbar.make(activity.findViewById(R.id.root), "Authentication success."+mAuth.getCurrentUser().getEmail(), Snackbar.LENGTH_SHORT).show();
 
+                           if(mAuth.getCurrentUser().getEmail().equals(context.getResources().getString(R.string.admin1))||
+                                   mAuth.getCurrentUser().getEmail().equals(context.getResources().getString(R.string.admin2))||
+                                   mAuth.getCurrentUser().getEmail().equals(context.getResources().getString(R.string.admin3)))
+                            ((MainActivity) activity).setAdmin(true);
                             // SharedPreferences.Editor sPEditor= PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
                             //sPEditor.putString(Cnst.Email,user.getEmail());
                             //sPEditor.commit();

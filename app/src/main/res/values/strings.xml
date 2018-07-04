@@ -5,8 +5,8 @@
     <string name="sign_in">KoreaProbnik</string>
     <string name="sign_out">KoreaProbnik</string>
 
-    <string name="action_login">Войти</string>
-    <string name="action_logout">Выйти</string>
+    <string name="action_login">Login</string>
+    <string name="action_logout">Logout</string>
     <string name="action_add">Добавить</string>
     <string name="action_update">Изменить</string>
     <string name="action_delete">Удалить</string>
@@ -57,5 +57,7 @@
     <string name="category11">Солнцезащитные средства</string>
     <string name="category12">Скидки</string>
 
-
+    <string name="admin1">kodman.dev@gmail.com</string>
+    <string name="admin2">mel.ole24@gmail.com</string>
+    <string name="admin3">gusackova@gmail.com</string>
 </resources>

@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import kodman.koreaprobnik.EditActivity;
 import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.R;
@@ -51,49 +53,51 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
 
     private Context context;
- //   private List<Product> products;
+    //   private List<Product> products;
     private FirestoreHelper fb;
     Product product;
-    boolean status=true;
+    boolean isAdmin;
     String category;
-    ArrayList listForRemoved= new ArrayList();
+    ArrayList listForRemoved = new ArrayList();
     AppCompatActivity activity;
+    // private ViewHolder viewHolder;
 
-    public void delProduct(){
-        for(int i=0;i<listForRemoved.size();i++)
-        {
-         Log.e(Cnst.TAG,"DEL:"+listForRemoved.get(i));
-         FirestoreHelper.getInstance(activity).removeProduct(String.valueOf(listForRemoved.get(i)));
+    public void delProduct() {
+        for (int i = 0; i < listForRemoved.size(); i++) {
+            Log.e(Cnst.TAG, "DEL:" + listForRemoved.get(i));
+            FirestoreHelper.getInstance(activity).removeProduct(String.valueOf(listForRemoved.get(i)));
         }
     }
 
-    public AdapterProduct( List<Product> products, Context context, AppCompatActivity activity,String category) {
+    public AdapterProduct(List<Product> products, Context context, AppCompatActivity activity, String category, boolean isAdmin) {
 
         //fb = FirestoreHelper.getInstance(activity);
         super(FirestoreHelper.getInstance(activity).getQuery(category));
-      //  Log.d(Cnst.TAG,"adaoter Constructor");
+        //  Log.d(Cnst.TAG,"adaoter Constructor");
         this.context = context;
-        this.category=category;
-        this.activity=activity;
-       // this.products = products;
+        this.category = category;
+        this.activity = activity;
+        this.isAdmin = isAdmin;
+        // this.products = products;
 
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        //  Log.d(TAG,"onCreateViewHolder");
-        // View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.event_item, viewGroup, false);
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_product, viewGroup, false);
 
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_product, viewGroup, false);
+        //this.viewHolder=new ViewHolder(v);
+        //return this.viewHolder;
         return new ViewHolder(v);
+
     }
 
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-       viewHolder.bind(getSnapshot(i));
-      }
+        viewHolder.bind(getSnapshot(i));
+    }
 
 //    @Override
 //    public int getItemCount() {
@@ -107,13 +111,22 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
 
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvTitle;
-        private TextView tvDescription;
 
-        private TextView tvPrice;
-        private Uri uri;
-        private ImageView iv;
+        @BindView(R.id.tvTitle)
+        TextView tvTitle;
+
+        @BindView(R.id.tvDescription)
+        TextView tvDescription;
+
+        @BindView(R.id.tvPrice)
+        TextView tvPrice;
+
+
+        @BindView(R.id.iv)
+        ImageView iv;
+
         private Product currentProduct;
+        private Uri uri;
 
         public void bind(final DocumentSnapshot snapshot) //,final OnRestaurantSelectedListener listener) {
         {
@@ -122,32 +135,29 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             currentProduct = snapshot.toObject(Product.class);
             currentProduct.setId(snapshot.getId());
 
-            if(!listForRemoved.contains(currentProduct.getId()))
-            {
+            if (!listForRemoved.contains(currentProduct.getId())) {
                 itemView.setClickable(true);
                 itemView.setBackgroundResource(R.drawable.item_recycler);
-            }
-            else{
+            } else {
                 itemView.setClickable(false);
                 itemView.setBackgroundResource(R.drawable.item_recycler_selected);
             }
-            Log.d(Cnst.TAG,"bind:"+currentProduct+"\n----------------------------");
-           // currentProduct.setPathImage(snapshot.g.getData().get(Cnst.IMAGES).toString());
+            Log.d(Cnst.TAG, "bind:" + currentProduct + "\n----------------------------");
+            // currentProduct.setPathImage(snapshot.g.getData().get(Cnst.IMAGES).toString());
             //Log.d(Cnst.TAG,"bind : "+snapshot.getId());
             Resources resources = itemView.getResources();
 
 
-
             // Log.d(Cnst.TAG, "onBindViewHolder event = " + product.getTitle());
-            tvTitle.setText( currentProduct.getTitle());
+            tvTitle.setText(currentProduct.getTitle());
             //  viewHolder.tvDescription.setText(product.getDescription());
-            tvPrice.setText(String.valueOf( currentProduct.getPrice()));
-            tvDescription.setText(String.valueOf( currentProduct.getDescription()));
+            tvPrice.setText(String.valueOf(currentProduct.getPrice()));
+            tvDescription.setText(String.valueOf(currentProduct.getDescription()));
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
-          // final StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
+            // final StorageReference httpsReference = storage.getReferenceFromUrl("https://firebasestorage.googleapis.com/v0/b/koreaprobnik-20240.appspot.com/o/gold_nand.jpg?alt=media&token=5e2dbf5e-369f-4705-8688-14a49d290bb8");
 
-           // Log.d(Cnst.TAG,"Bind Product  pathImage= "+currentProduct);
+            // Log.d(Cnst.TAG,"Bind Product  pathImage= "+currentProduct);
 
             //StorageReference gsReference = storage.getReferenceFromUrl("gs://koreaprobnik-20240.appspot.com/images/171045");
             // Загружаем изображения
@@ -155,16 +165,16 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
             iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
 
             try {
-                 final  StorageReference gsReference = storage.getReferenceFromUrl(currentProduct.getUri());
-                  final File  localFile   = File.createTempFile("images", ".jpg");
+                final StorageReference gsReference = storage.getReferenceFromUrl(currentProduct.getUri());
+                final File localFile = File.createTempFile("images", ".jpg");
 
-                      gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 
-                       currentProduct.setPathImage(localFile.getAbsolutePath());
+                        currentProduct.setPathImage(localFile.getAbsolutePath());
                         currentProduct.setUri(gsReference.toString());
-                       Log.d(Cnst.TAG,"adapter set URI "+currentProduct.getUri());
+                        Log.d(Cnst.TAG, "adapter set URI " + currentProduct.getUri());
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
 
 
@@ -174,113 +184,131 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                                 //   .load( "gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")
                                 .into(iv);
 
-                      //  iv.setImageBitmap(myBitmap);
-                        if(myBitmap==null)
-                        {
+                        //  iv.setImageBitmap(myBitmap);
+                        if (myBitmap == null) {
 
                         }
-                     //   Log.d(Cnst.TAG,"onSucces : "+taskSnapshot.getStorage().getName());
+                        //   Log.d(Cnst.TAG,"onSucces : "+taskSnapshot.getStorage().getName());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                     //   iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
-                        Log.d(Cnst.TAG,"Faillure : "+e.getMessage()+": "+currentProduct.getTitle());
+                        //   iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
+                        Log.d(Cnst.TAG, "Faillure : " + e.getMessage() + ": " + currentProduct.getTitle());
                     }
                 });
             } catch (IOException e) {
                 e.printStackTrace();
 
-               // iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
-            }
-            catch (Exception e) {
+                // iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
+            } catch (Exception e) {
                 e.printStackTrace();
-              //  iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
+                //  iv.setImageDrawable(context.getResources().getDrawable(R.drawable.gift));
             }
-
 
 
         }
-
 
 
         public ViewHolder(final View itemView) {
             super(itemView);
 
+            ButterKnife.bind(this,itemView);
 
-            //this.id = (TextView) itemView.findViewById(R.id.tvItemID);
-            this.tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            this.tvDescription = (TextView) itemView.findViewById(R.id.tvDescription);
-            this.tvPrice = (TextView) itemView.findViewById(R.id.tvPrice);
-            // this.alarmName = (TextView) itemView.findViewById(R.id.tvItemAlarmName);
-            this.iv = (ImageView) itemView.findViewById(R.id.iv);
+            //Log.d(Cnst.TAG, " tvTitle = "+tvTitle);
 
 
 
-            Bitmap bitmap = null;
-            try {
-                Log.d(Cnst.TAG,"bitmap  try crweate");
-              //  bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-              //  Log.d(Cnst.TAG,"Exception : ");
-
-            }
-
-            // Log.d("---", "setBitmap = " + bitmap);
-            if (null != bitmap)
-            {
-               // iv.setImageBitmap(bitmap);
-              //  Log.d(Cnst.TAG,"bitmap set : "+bitmap);
-            }
-            else {
-                 // Log.d(Cnst.TAG,"bitmap DEFAULT pos="+ currentProduct);
-               // iv.setImageDrawable(context.getResources().getDrawable(R.drawable.default_product));
-                //iv.setImageDrawable(context.getDrawable(R.drawable.googleg_standard_color_18));
-            }
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    Toast.makeText(context, "CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(context, EditActivity.class);
+                    if (isAdmin) {
+                        Toast.makeText(context, "CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
 
-                    //currentProduct.setCategory("Патчи");
-                    intent.putExtra(Cnst.PRODUCT, currentProduct);
-                    Log.d(Cnst.TAG," put product :"+currentProduct.hashCode());
-
-                    context.startActivity(intent);
+                        Intent intent = new Intent(context, EditActivity.class);
+                        intent.putExtra(Cnst.PRODUCT, currentProduct);
+                        //Log.d(Cnst.TAG, " put product :" + currentProduct.hashCode());
+                        context.startActivity(intent);
+                    } else {
+                        Toast.makeText(context, "not admin CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
+            if (isAdmin)
+                itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
 
-                    Log.d(Cnst.TAG,"onLongClick");
-                    if(itemView.isClickable())
-                    {
-                        listForRemoved.add(currentProduct.getId());
-                        itemView.setClickable(false);
-                        itemView.setBackgroundResource(R.drawable.item_recycler_selected);
-                        //itemView.setBackgroundColor(context.getResources().getColor(R.color.colorSelected));
+                        Log.d(Cnst.TAG, "onLongClick");
+                        if (itemView.isClickable()) {
+                            listForRemoved.add(currentProduct.getId());
+                            itemView.setClickable(false);
+                            itemView.setBackgroundResource(R.drawable.item_recycler_selected);
+                            //itemView.setBackgroundColor(context.getResources().getColor(R.color.colorSelected));
+                        } else {
+                            listForRemoved.remove(currentProduct.getId());
+                            itemView.setClickable(true);
+                            itemView.setBackgroundResource(R.drawable.item_recycler);
+                        }
+
+                        return true;
                     }
-                    else
-                    {
-                        listForRemoved.remove(currentProduct.getId());
-                        itemView.setClickable(true);
-                        itemView.setBackgroundResource(R.drawable.item_recycler);
-                    }
-
-                    return true;
-                }
 
 
-            });
+                });
 
         }
+    }
+
+    public void setClickAdmin(boolean bool) {
+
+//        if (bool) {
+//            Log.d(Cnst.TAG, "Adapter setAdmin");
+//            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    if (isAdmin) {
+//                        Toast.makeText(context, "CLICK id = " + viewHolder.tvTitle.getText(), Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(context, EditActivity.class);
+//
+//                        //currentProduct.setCategory("Патчи");
+//                        intent.putExtra(Cnst.PRODUCT, viewHolder.currentProduct);
+//                        Log.d(Cnst.TAG, " put product :" + viewHolder.currentProduct.hashCode());
+//
+//                        context.startActivity(intent);
+//                    } else {
+//                        Toast.makeText(context, "not admin CLICK id = " + viewHolder.tvTitle.getText(), Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//            });
+//
+//
+//            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View v) {
+//
+//                    Log.d(Cnst.TAG, "onLongClick");
+//                    if (viewHolder.itemView.isClickable()) {
+//                        listForRemoved.add(viewHolder.currentProduct.getId());
+//                        viewHolder.itemView.setClickable(false);
+//                        viewHolder.itemView.setBackgroundResource(R.drawable.item_recycler_selected);
+//                        //itemView.setBackgroundColor(context.getResources().getColor(R.color.colorSelected));
+//                    } else {
+//                        listForRemoved.remove(viewHolder.currentProduct.getId());
+//                        viewHolder.itemView.setClickable(true);
+//                        viewHolder.itemView.setBackgroundResource(R.drawable.item_recycler);
+//                    }
+//
+//                    return true;
+//                }
+//
+//
+//            });
+//        }
     }
 }
 
