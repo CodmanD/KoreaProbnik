@@ -223,6 +223,11 @@ public void downloadFile(String file,final ImageView iv)
 }
 
 
+public void show(){
+
+        Log.d(Cnst.TAG,mAuth.getCurrentUser().toString());
+}
+
     public void signOut() {
         // Firebase sign out
         mAuth.signOut();
@@ -237,6 +242,10 @@ public void downloadFile(String file,final ImageView iv)
                 Snackbar.make(activity.findViewById(R.id.root), "Logout success", Snackbar.LENGTH_SHORT).show();
 
                 ((MainActivity)activity).setAdmin(false);
+                SharedPreferences.Editor sPEditor= PreferenceManager.getDefaultSharedPreferences(activity).edit();
+                sPEditor.remove(Cnst.Email);
+                sPEditor.commit();
+                ((MainActivity)activity).setMenuItem(2,activity.getResources().getString(R.string.action_login));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -292,10 +301,13 @@ public void downloadFile(String file,final ImageView iv)
                            if(mAuth.getCurrentUser().getEmail().equals(context.getResources().getString(R.string.admin1))||
                                    mAuth.getCurrentUser().getEmail().equals(context.getResources().getString(R.string.admin2))||
                                    mAuth.getCurrentUser().getEmail().equals(context.getResources().getString(R.string.admin3)))
-                            ((MainActivity) activity).setAdmin(true);
-                            // SharedPreferences.Editor sPEditor= PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit();
-                            //sPEditor.putString(Cnst.Email,user.getEmail());
-                            //sPEditor.commit();
+                           {
+                               ((MainActivity) activity).setAdmin(true);
+                           }
+                            SharedPreferences.Editor sPEditor= PreferenceManager.getDefaultSharedPreferences(activity).edit();
+                            sPEditor.putString(Cnst.Email,user.getEmail());
+                            sPEditor.commit();
+                            ((MainActivity)activity).setMenuItem(2,user.getEmail());
                             Log.d(TAG,"Editor put email: "+user.getEmail());
 
 

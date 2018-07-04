@@ -1,7 +1,9 @@
 package kodman.koreaprobnik;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -128,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // set item as selected to persist highlight
-                        menuItem.setChecked(true);
+                       // menuItem.setChecked(true);
                         category=menuItem.getTitle().toString();
 
                         adapter = new AdapterProduct(products, MainActivity.this, MainActivity.this,category,isAdmin){
@@ -183,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
        setAdapter(isAdmin);
 
+      // FirestoreHelper.getInstance(this).show();
     }
 
     private void setAdapter(boolean rules){
@@ -261,17 +264,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        if(!isAdmin)
-        {   menu.getItem(0).setVisible(false);
-            menu.getItem(1).setVisible(false);
-        }
+
         this.menu=menu;
+
+        SharedPreferences sP= PreferenceManager.getDefaultSharedPreferences(this);
+        Log.d(Cnst.TAG,"shared email:"+sP.getString(Cnst.Email,"ee"));
+       String user=sP.getString(Cnst.Email,getResources().getString(R.string.action_login));
+        if(user.equals(getResources().getString(R.string.action_login)))
+        {
+            isAdmin=false;
+            menu.getItem(2).setTitle(getResources().getString(R.string.action_login));
+        }
+        else
+        {
+            isAdmin=true;
+            menu.getItem(2).setTitle(user);
+        }
+
+        setAdmin(isAdmin);
         return true;
     }
 
-
+    public void setMenuItem(int pos,String title)
+    {
+        menu.getItem(pos).setTitle(title);
+    }
     public void setAdmin(boolean isAdmin)
     {
+        Log.d(Cnst.TAG,"MainActivity setAdmin");
         this.isAdmin=isAdmin;
         if(isAdmin)
         {
@@ -279,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             menu.getItem(1).setVisible(true);
             setAdapter(isAdmin);
             //adapter.setClickAdmin(isAdmin);
-            Log.d(Cnst.TAG,"MainActivity setAdmin");
+
         }
         else{
             menu.getItem(0).setVisible(false);

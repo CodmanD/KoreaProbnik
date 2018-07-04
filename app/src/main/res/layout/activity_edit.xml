@@ -26,11 +26,12 @@
         <!--tools:title="@tools:sample/lorem" >-->
 
         <Spinner
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:id="@+id/spinner"
+            android:textSize="@dimen/textSizeDescription"
             ></Spinner>
     </android.support.v7.widget.Toolbar>
     <!--<android.support.v7.widget.Toolbar-->

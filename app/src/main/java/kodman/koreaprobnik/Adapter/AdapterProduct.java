@@ -40,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import kodman.koreaprobnik.EditActivity;
 import kodman.koreaprobnik.Model.Product;
+import kodman.koreaprobnik.ProductActivity;
 import kodman.koreaprobnik.R;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirebaseImageLoader;
@@ -232,7 +233,12 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                         //Log.d(Cnst.TAG, " put product :" + currentProduct.hashCode());
                         context.startActivity(intent);
                     } else {
-                        Toast.makeText(context, "not admin CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(context, ProductActivity.class);
+                        intent.putExtra(Cnst.PRODUCT, currentProduct);
+                        //Log.d(Cnst.TAG, " put product :" + currentProduct.hashCode());
+                        context.startActivity(intent);
+                     //   Toast.makeText(context, "not admin CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
