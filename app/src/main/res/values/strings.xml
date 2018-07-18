@@ -11,7 +11,7 @@
     <string name="action_update">Изменить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_save">Сохранить</string>
-
+    <string name="action_filter">Фильтр</string>
 
 
     <string name="name">Название:</string>
@@ -26,6 +26,12 @@
     <string name="succes_update">Продукт изменен</string>
     <string name="failure_update">Ошибка изменения на сервер</string>
 
+
+    <string name="dialog_ok">Показать</string>
+    <string name="dialog_cancel">Вернуться</string>
+    <string name="hint_search">Поиск:</string>
+    <string name="from"> от </string>
+    <string name="to"> до </string>
     <string name="spinner_title">Выберите категорию:  </string>
     <string-array name="categories">
 

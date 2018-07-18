@@ -1,5 +1,9 @@
 package kodman.koreaprobnik;
 
+import android.app.AlertDialog;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -12,10 +16,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -41,7 +49,14 @@ import kodman.koreaprobnik.Model.Product;
 import kodman.koreaprobnik.Util.Cnst;
 import kodman.koreaprobnik.Util.FirestoreHelper;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,View.OnKeyListener {
+
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+    Toast.makeText(this,"KeyCode = "+keyCode,Toast.LENGTH_SHORT).show();
+        return false;
+    }
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -64,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     String category;//="all";
     private Menu menu;
+
+    int minPrice=0;
+    int maxPrice=0;
+    int searchTitle=0;
 
     boolean isAdmin=false;
     @Override
@@ -282,6 +301,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         setAdmin(isAdmin);
+
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        if(null!=searchManager ) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        }
+        searchView.setIconifiedByDefault(false);
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this,((SearchView)v).getQuery(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+               // Toast.makeText(MainActivity.this,query,Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+               // Toast.makeText(MainActivity.this,newText,Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -343,11 +393,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 return true;
             }
+            case R.id.actionFilter:{
 
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+// ...Irrelevant code for customizing the buttons and title
+                LayoutInflater inflater = this.getLayoutInflater();
+                final View dialogView = inflater.inflate(R.layout.filter, null);
+                dialogBuilder.setView(dialogView).setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                      EditText etTitle= dialogView.findViewById(R.id.etTitle);
+                        EditText etMinPrice= dialogView.findViewById(R.id.priceMin);
+                        EditText etMaxPrice= dialogView.findViewById(R.id.priceMax);
+                      String[] params=new String [3];
+                      params[0]=etTitle.getText().toString();
+                        params[1]=etMinPrice.getText().toString();
+                        params[2]=etMaxPrice.getText().toString();
+                      showProduct(params);
+                    }
+                }).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                       dialog.cancel();
+                    }}).setCancelable(true);
+
+               // EditText editText = (EditText) dialogView.findViewById(R.id.label_field);
+               // editText.setText("test label");
+                AlertDialog alertDialog = dialogBuilder.create();
+
+                alertDialog.show();
+                return true;
+            }
 
         }
         return super.onOptionsItemSelected(item);
     }
 
 
+
+    private  void showProduct(String []params)
+    {
+
+
+        adapter.setQuery(FirestoreHelper.getInstance(this).getQuery(params));
+        adapter.notifyDataSetChanged();
+    }
 }

@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,7 +34,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -52,6 +55,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import kodman.koreaprobnik.LoginActivity;
 import kodman.koreaprobnik.MainActivity;
@@ -472,16 +476,38 @@ public void show(){
         Query   mQuery;
         if(category.equals(context.getResources().getString(R.string.category0)))
         {
-            Log.d(Cnst.TAG,"All");
+           // Log.d(Cnst.TAG,"---All:"+mFirestore.collection(Cnst.PRODUCT).document());
             mQuery=  mFirestore.collection(Cnst.PRODUCT)
-                    .orderBy("title", Query.Direction.DESCENDING)
-                    .limit(100);
+                    .orderBy(Cnst.TITLE, Query.Direction.DESCENDING)
+                    ;
+
         }
         else
             mQuery=  mFirestore.collection(Cnst.PRODUCT)
                  .whereEqualTo(Cnst.CATEGORY,category)
-                .orderBy("title", Query.Direction.DESCENDING)
-                .limit(100);
+                .orderBy(Cnst.TITLE, Query.Direction.DESCENDING)
+                .limit(mFirestore.collection(Cnst.PRODUCT).get().getResult().size());
+        return mQuery;
+    }
+
+
+    public Query getQuery(String[] params)
+    {
+        Log.d("---","Params: "+params[0]+"|"+params[1]+"|"+params[2]);
+        Query mQuery=  mFirestore.collection(Cnst.PRODUCT)
+               // .orderBy(Cnst.PRICE, Query.Direction.DESCENDING)
+                //.whereEqualTo(Cnst.TITLE);
+                .whereGreaterThanOrEqualTo( Cnst.PRICE, Integer.parseInt(params[1]) )
+                .whereLessThanOrEqualTo(Cnst.PRICE,Integer.parseInt(params[2]));
+        mQuery.addSnapshotListener(activity, new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                Log.d("---","onEvent: "+queryDocumentSnapshots.getDocuments().get(0));
+            }
+        });
+
+                        // .limit(mFirestore.collection(Cnst.PRODUCT).get().getResult().size());
+                        Log.d("---", "Query: " + mQuery);
         return mQuery;
     }
 

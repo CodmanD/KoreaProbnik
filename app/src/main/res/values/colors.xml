@@ -6,4 +6,6 @@
     <color name="colorBack">#a9dbff</color>
     <color name="colorSelected">#c9c9c9</color>
     <color name="colorUnSelected">#ffffff</color>
+    <color name="colorPrice">#fccae9</color>
+    <color name="colorBorder">#585858</color>
 </resources>

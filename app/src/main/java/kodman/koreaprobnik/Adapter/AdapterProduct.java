@@ -143,7 +143,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                 itemView.setClickable(false);
                 itemView.setBackgroundResource(R.drawable.item_recycler_selected);
             }
-            Log.d(Cnst.TAG, "bind:" + currentProduct + "\n----------------------------");
+         //   Log.d(Cnst.TAG, "bind:" + currentProduct + "\n----------------------------");
             // currentProduct.setPathImage(snapshot.g.getData().get(Cnst.IMAGES).toString());
             //Log.d(Cnst.TAG,"bind : "+snapshot.getId());
             Resources resources = itemView.getResources();
@@ -179,11 +179,13 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                         Bitmap myBitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
 
 
-                        Glide.with(context)
-                                .load(localFile)
-                                // .using(new FirebaseImageLoader())
-                                //   .load( "gs://koreaprobnik-20240.appspot.com/gold_nand.jpg")
-                                .into(iv);
+                        try {
+                            Glide.with(context)
+                                    .load(localFile)
+                                    .into(iv);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                         //  iv.setImageBitmap(myBitmap);
                         if (myBitmap == null) {
@@ -214,11 +216,9 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
         public ViewHolder(final View itemView) {
             super(itemView);
 
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
 
             //Log.d(Cnst.TAG, " tvTitle = "+tvTitle);
-
-
 
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -238,7 +238,7 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
                         intent.putExtra(Cnst.PRODUCT, currentProduct);
                         //Log.d(Cnst.TAG, " put product :" + currentProduct.hashCode());
                         context.startActivity(intent);
-                     //   Toast.makeText(context, "not admin CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
+                        //   Toast.makeText(context, "not admin CLICK id = " + tvTitle.getText(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });

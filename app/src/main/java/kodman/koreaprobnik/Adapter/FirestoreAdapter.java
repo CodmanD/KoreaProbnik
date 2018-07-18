@@ -40,7 +40,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         }
 
         // Запускаем event в зависимости от изменения, произошедшего в Firestore
-        Log.d(TAG, "onEvent:numChanges:" + documentSnapshots.getDocumentChanges().size());
+        Log.d(TAG, "---onEvent:numChanges:" + documentSnapshots.getDocumentChanges().size());
         for (DocumentChange change : documentSnapshots.getDocumentChanges()) {
             switch (change.getType()) {
                 case ADDED:// добавление
@@ -101,6 +101,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     // данные добавлены
     protected void onDocumentAdded(DocumentChange change) {
+        Log.d("---","DocAdded : "+change);
         mSnapshots.add(change.getNewIndex(), change.getDocument());
         notifyItemInserted(change.getNewIndex());
     }
