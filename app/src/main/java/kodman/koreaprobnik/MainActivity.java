@@ -207,8 +207,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
       // FirestoreHelper.getInstance(this).show();
     }
 
+    private void setAdapter(boolean rules,String []params){
+      adapter=  new AdapterProduct(products, this, this,category,rules,params,params[0]){
+
+            @Override
+            protected void onDataChanged() {
+
+                // Покажи/спрячь данные в UI если запрос возвращается пустым
+                if (getItemCount() == 0) {
+                    recyclerView.setVisibility(View.GONE);
+                    //mEmptyView.setVisibility(View.VISIBLE);
+
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    //mEmptyView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            protected void onError(FirebaseFirestoreException e) {
+                // Покажи снакбар в случаи ошибки
+                //  Snackbar.make(findViewById(android.R.id.content),
+                //          "Ошибка: смотрите логи", Snackbar.LENGTH_LONG).show();
+            }
+        };
+        adapter.startListening();
+        recyclerView.setAdapter(adapter);
+    }
+
     private void setAdapter(boolean rules){
-      adapter=  new AdapterProduct(products, this, this,category,rules){
+        adapter=  new AdapterProduct(products, this, this,category,rules){
 
             @Override
             protected void onDataChanged() {
@@ -409,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                       params[0]=etTitle.getText().toString();
                         params[1]=etMinPrice.getText().toString();
                         params[2]=etMaxPrice.getText().toString();
-                      showProduct(params);
+                      setAdapter(isAdmin,params);
                     }
                 }).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

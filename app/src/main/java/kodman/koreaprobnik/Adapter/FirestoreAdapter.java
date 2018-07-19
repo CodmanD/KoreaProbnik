@@ -13,6 +13,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+import kodman.koreaprobnik.Util.Cnst;
+
 public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH>
         implements EventListener<QuerySnapshot> {
@@ -21,13 +23,24 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     // Переменные
     // Запрос
     private Query mQuery;
+
+    //для добавления с параметрами
+    private boolean flag = false;
+    private String title;
+
     // Подписка
     private ListenerRegistration mRegistration;
     // Лист
     private ArrayList<DocumentSnapshot> mSnapshots = new ArrayList<>();
+
     // Конструктор
     public FirestoreAdapter(Query query) {
         mQuery = query;
+    }
+
+    public FirestoreAdapter(Query query, String title) {
+        mQuery = query;
+       this.title =title;
     }
 
     // переписанный метод интерфейса EventListener
@@ -44,7 +57,10 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         for (DocumentChange change : documentSnapshots.getDocumentChanges()) {
             switch (change.getType()) {
                 case ADDED:// добавление
-                    onDocumentAdded(change);
+                    if (title != null)
+                        onDocumentAdded(change, title);
+                    else
+                        onDocumentAdded(change);
                     break;
                 case MODIFIED:// изменение
                     onDocumentModified(change);
@@ -101,9 +117,23 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     // данные добавлены
     protected void onDocumentAdded(DocumentChange change) {
-        Log.d("---","DocAdded : "+change);
+        Log.d("---", "DocAdded : " + change);
         mSnapshots.add(change.getNewIndex(), change.getDocument());
         notifyItemInserted(change.getNewIndex());
+    }
+
+    protected void onDocumentAdded(DocumentChange change, String title) {
+        Log.d("---", "DocAdded withparams: " + change);
+        if(change.getDocument().getData().get(Cnst.TITLE).toString().contains(title)
+                ||change.getDocument().getData().get(Cnst.DESCRIPTION).toString().contains(title))
+        {
+            mSnapshots.add( change.getDocument());
+            Log.d("---", "DocAdded withparams Title: " + title);
+
+            Log.d("---", "DocAdded withparams Title: " + title);
+
+            notifyItemInserted(change.getNewIndex());
+        }
     }
 
     // данные изменены
@@ -127,8 +157,12 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     // ошибка
-    protected void onError(FirebaseFirestoreException e) {};
+    protected void onError(FirebaseFirestoreException e) {
+    }
+
+    ;
 
     // метод имплементируется (определяется) наследуемымм классами
-    protected void onDataChanged() {}
+    protected void onDataChanged() {
+    }
 }

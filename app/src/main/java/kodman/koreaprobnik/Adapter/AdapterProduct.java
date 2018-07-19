@@ -73,7 +73,22 @@ public class AdapterProduct extends FirestoreAdapter<AdapterProduct.ViewHolder> 
     public AdapterProduct(List<Product> products, Context context, AppCompatActivity activity, String category, boolean isAdmin) {
 
         //fb = FirestoreHelper.getInstance(activity);
-        super(FirestoreHelper.getInstance(activity).getQuery(category));
+        super(FirestoreHelper.getInstance(activity).getQuery(category,null));
+        //  Log.d(Cnst.TAG,"adaoter Constructor");
+        this.context = context;
+        this.category = category;
+        this.activity = activity;
+        this.isAdmin = isAdmin;
+        // this.products = products;
+
+    }
+
+    public AdapterProduct(List<Product> products, Context context, AppCompatActivity activity,
+                          String category,
+                          boolean isAdmin,String[] params,String title) {
+
+        //fb = FirestoreHelper.getInstance(activity);
+        super(FirestoreHelper.getInstance(activity).getQuery(category,params),title);
         //  Log.d(Cnst.TAG,"adaoter Constructor");
         this.context = context;
         this.category = category;
