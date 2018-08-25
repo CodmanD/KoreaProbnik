@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String category;//="all";
     private Menu menu;
 
+    String userName;
+
     int minPrice=0;
     int maxPrice=0;
     int searchTitle=0;
@@ -365,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setMenuItem(int pos,String title)
     {
+        Log.d(Cnst.TAG,"Menu item"+title);
         menu.getItem(pos).setTitle(title);
     }
     public void setAdmin(boolean isAdmin)
@@ -373,15 +376,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.isAdmin=isAdmin;
         if(isAdmin)
         {
-            menu.getItem(0).setVisible(true);
             menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(true);
+            menu.getItem(3).setTitle(FirestoreHelper.getInstance(this).getUser());
             setAdapter(isAdmin);
             //adapter.setClickAdmin(isAdmin);
 
         }
         else{
-            menu.getItem(0).setVisible(false);
             menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(false);
             setAdapter(isAdmin);
         }
 

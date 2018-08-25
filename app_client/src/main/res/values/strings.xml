@@ -1,3 +1,76 @@
 <resources>
-    <string name="app_name">app_client</string>
+    <string name="app_name">KPClient</string>
+    <string name="user_name">KoreaProbnik</string>
+    <string name="user_password">KoreaProbnik</string>
+    <string name="sign_in">KoreaProbnik</string>
+    <string name="sign_out">KoreaProbnik</string>
+
+    <string name="action_login">Login</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_add">Добавить</string>
+    <string name="action_update">Изменить</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_filter">Фильтр</string>
+
+
+    <string name="name">Название:</string>
+    <string name="title">Название:</string>
+    <string name="price">Цена:</string>
+    <string name="category">Категория</string>
+    <string name="description">Описание:</string>
+    <string name="failure_upload">Ошибка записи файла на сервер</string>
+    <string name="failure_add">Ошибка добавления на сервер</string>
+    <string name="succes_upload">Файл успешно добавлен</string>
+    <string name="succes_add">Продукт добавлен</string>
+    <string name="succes_update">Продукт изменен</string>
+    <string name="failure_update">Ошибка изменения на сервер</string>
+
+
+    <string name="dialog_ok">Найти</string>
+    <string name="dialog_cancel">Вернуться</string>
+    <string name="hint_search">Поиск:</string>
+    <string name="from"> от </string>
+    <string name="to"> до </string>
+    <string name="spinner_title">Выберите категорию:  </string>
+    <string-array name="categories">
+
+        <item>Крем для глаз</item>
+        <item>Крем для лица</item>
+        <item>Патчи и маски</item>
+        <item>Тонер Эмульсия Эссенция</item>
+        <item>Миниатюры Наборы</item>
+        <item>Тонирующие средства</item>
+        <item>Очищение кожи</item>
+        <item>Пробники</item>
+        <item>Декоративная косметика</item>
+        <item>Уход за телом и волосами</item>
+        <item>Солнцезащитные средства</item>
+        <item>Скидки</item>
+    </string-array>
+
+    <string name="category0">Все товары</string>
+    <string name="category1">Крем для глаз</string>
+    <string name="category2">Крем для лица</string>
+    <string name="category3">Патчи и маски</string>
+    <string name="category4">Тонер Эмульсия Эссенция</string>
+    <string name="category5">Миниатюры Наборы</string>
+    <string name="category6">Тонирующие средства</string>
+    <string name="category7">Очищение кожи</string>
+    <string name="category8">Пробники</string>
+    <string name="category9">Декоративная косметика</string>
+    <string name="category10">Уход за телом и волосами</string>
+    <string name="category11">Солнцезащитные средства</string>
+    <string name="category12">Скидки</string>
+
+
+    <string name="consulting">Консультанты</string>
+    <string name="name1">Лена</string>
+    <string name="tel1_a">+380636044087</string>
+    <string name="name2">Аня</string>
+    <string name="tel2_a">+380994263540</string>
+
+    <string name="admin1">kodman.dev@gmail.com</string>
+    <string name="admin2">mel.ole24@gmail.com</string>
+    <string name="admin3">gusackova@gmail.com</string>
 </resources>

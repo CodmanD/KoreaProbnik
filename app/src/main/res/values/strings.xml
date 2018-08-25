@@ -19,6 +19,7 @@
     <string name="price">Цена:</string>
     <string name="category">Категория</string>
     <string name="description">Описание:</string>
+    <string name="quantity">Количество:</string>
     <string name="failure_upload">Ошибка записи файла на сервер</string>
     <string name="failure_add">Ошибка добавления на сервер</string>
     <string name="succes_upload">Файл успешно добавлен</string>

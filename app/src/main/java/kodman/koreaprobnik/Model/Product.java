@@ -15,6 +15,17 @@ import kodman.koreaprobnik.BR;
  */
 
 public class Product extends BaseObservable implements Parcelable {
+
+    private String id;
+    private String title;
+    private String category;
+    private String description;
+    private String pathImage;
+    private String uri;
+    private float price;
+    private int quantity;
+
+
     public static final Creator<Product> CREATOR = new Creator<Product>() {
         @Override
         public Product createFromParcel(Parcel source) {
@@ -36,6 +47,7 @@ public class Product extends BaseObservable implements Parcelable {
         dest.writeString(pathImage);
         dest.writeString(uri);
         dest.writeDouble(price);
+        dest.writeInt(quantity);
 
     }
 
@@ -52,20 +64,13 @@ public class Product extends BaseObservable implements Parcelable {
         pathImage=in.readString();
         uri=in.readString();
         price = (float)in.readDouble();
-
+        quantity=in.readInt();
     }
 
 
 
-    private String id;
-    private String title;
-    private String category;
-    private String description;
-    private String pathImage;
-    private String uri;
-    private float price;
 
-    public Product(String uid,String title,String category,String description,String uri,String price){
+    public Product(String uid, String title, String category, String description, String uri, String price,String quantity){
 
         this.id=uid;
         this.title=title;
@@ -73,19 +78,29 @@ public class Product extends BaseObservable implements Parcelable {
         this.description=description;
         this.uri=uri;
         this.price=Float.parseFloat(price);
+        this.quantity=Integer.parseInt(quantity);
     }
 
     public Product(String title) {
         this.title = title;
-
+        this.quantity=0;
         this.description="some description";
         this.price=100.50f;
         this.pathImage="content://media/external/images/media/136728";
-       // this.uri=Uri.parse(this.pathImage);
+        // this.uri=Uri.parse(this.pathImage);
     }
 
     public String getUri() {
         return uri;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+        notifyPropertyChanged(BR.quantity);
     }
 
     public void setUri(String uri) {
@@ -96,7 +111,7 @@ public class Product extends BaseObservable implements Parcelable {
         this.title="unknown product";
         this.description="some description";
         this.price=100.50f;
-
+this.quantity=0;
     }
 
     @Bindable
@@ -115,7 +130,7 @@ public class Product extends BaseObservable implements Parcelable {
 
     public void setId(String id) {
         this.id = id;
-      //  notifyPropertyChanged(BR.id);
+        //  notifyPropertyChanged(BR.id);
     }
 
     @Bindable

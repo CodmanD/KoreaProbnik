@@ -89,7 +89,7 @@ public class ProductActivity extends AppCompatActivity {
 
 
                 } catch (Exception e) {
-                    Toast.makeText(ProductActivity.this,"Bitemap error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProductActivity.this,"Bitmap error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                      e.printStackTrace();
                 }
                // imageView.setImageDrawable(ProductActivity.this.getResources().getDrawable(R.drawable.gift));

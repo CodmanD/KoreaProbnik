@@ -20,7 +20,7 @@ public  final class Cnst {
     public static String PATH_IMAGE="pathImage";
     public static String ID="id";
     public static String PRICE="price";
-
+    public static String QUANTITY="quantity";
 
     public static String IMAGES="images/";
     public static String NEXT_ID="nextId";

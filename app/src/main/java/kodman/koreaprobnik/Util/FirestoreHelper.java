@@ -84,6 +84,9 @@ public class FirestoreHelper {
 
     private String user = "";
 
+    public String getUser() {
+        return user;
+    }
 
     final private Context context;
 
@@ -300,8 +303,8 @@ public class FirestoreHelper {
                             SharedPreferences.Editor sPEditor = PreferenceManager.getDefaultSharedPreferences(activity).edit();
                             sPEditor.putString(Cnst.Email, user.getEmail());
                             sPEditor.commit();
-                            ((MainActivity) activity).setMenuItem(2, user.getEmail());
-                            Log.d(TAG, "Editor put email: " + user.getEmail());
+                            ((MainActivity) activity).setMenuItem(4, user.getEmail());
+                            Log.d(Cnst.TAG, "Editor put email: " + user.getEmail());
 
 
                             // updateUI(user);
@@ -427,6 +430,7 @@ public class FirestoreHelper {
         product.put(Cnst.CATEGORY, p.getCategory());
         product.put(Cnst.DESCRIPTION, p.getDescription());
         product.put(Cnst.PRICE, p.getPrice());
+        product.put(Cnst.QUANTITY, p.getQuantity());
 
         String id = p.getId();
         if (id == null)
